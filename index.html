@@ -13,6 +13,7 @@
       background: radial-gradient(circle at top, #fff7cc, #ffd6ec 35%, #bde7ff 70%, #d7ffd9);
       color: #111827;
     }
+
     #stage { position: fixed; inset: 0; overflow: hidden; }
 
     .admin-bar {
@@ -20,7 +21,7 @@
       top: 12px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 50;
+      z-index: 80;
       display: none;
       gap: 8px;
       align-items: center;
@@ -28,7 +29,7 @@
       justify-content: center;
       width: min(96vw, 1100px);
       padding: 10px;
-      background: rgba(255,255,255,.94);
+      background: rgba(255,255,255,.95);
       border-radius: 24px;
       box-shadow: 0 10px 28px rgba(0,0,0,.18);
     }
@@ -42,6 +43,7 @@
       font-weight: 700;
       outline: none;
     }
+
     .btn, label.upload-btn {
       border: 0;
       padding: 9px 13px;
@@ -51,7 +53,7 @@
       font-weight: 900;
       cursor: pointer;
       box-shadow: 0 5px 0 #0369a1;
-      font-size: 12px;
+      font-size: 13px;
     }
     .btn:active, label.upload-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #0369a1; }
     .btn.purple { background: #8b5cf6; box-shadow: 0 5px 0 #5b21b6; }
@@ -60,30 +62,12 @@
     .btn.dark { background: #334155; box-shadow: 0 5px 0 #0f172a; }
     input[type="file"] { display: none; }
 
-    .winners-bar {
-      position: fixed;
-      top: 72px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 30;
-      background: rgba(255,255,255,.94);
-      border: 4px solid #111827;
-      border-radius: 999px;
-      padding: 10px 18px;
-      box-shadow: 0 10px 25px rgba(0,0,0,.2);
-      max-width: 92vw;
-      text-align: center;
-      font-size: clamp(14px, 2vw, 20px);
-      font-weight: 1000;
-      cursor: pointer;
-    }
-
     .celebrate-refresh {
       position: fixed;
       top: 10px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 35;
+      z-index: 40;
       border: 4px solid #111827;
       border-radius: 999px;
       background: linear-gradient(135deg, #fff, #fef3c7, #fde68a);
@@ -104,6 +88,22 @@
       margin-top: 1px;
     }
 
+    .winners-button {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 40;
+      background: rgba(255,255,255,.94);
+      border: 4px solid #111827;
+      border-radius: 999px;
+      padding: 10px 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.2);
+      font-size: clamp(14px, 2vw, 20px);
+      font-weight: 1000;
+      cursor: pointer;
+    }
+
     .footer-note {
       position: fixed;
       bottom: 12px;
@@ -122,7 +122,7 @@
     .character {
       position: absolute;
       width: 130px;
-      height: 210px;
+      height: 230px;
       transform-origin: center bottom;
       will-change: transform;
       user-select: none;
@@ -143,6 +143,7 @@
       z-index: 4;
     }
     .head img { width: 100%; height: 100%; object-fit: cover; }
+
     .name-tag {
       position: absolute;
       top: 92px;
@@ -167,7 +168,7 @@
 
     .winner-chain {
       position: absolute;
-      top: 140px;
+      top: 156px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 9;
@@ -184,7 +185,6 @@
       border: 8px dashed #fbbf24;
       border-bottom: 0;
       border-radius: 60px 60px 0 0;
-      background: transparent;
     }
     .chain-medal {
       width: 108px;
@@ -198,7 +198,7 @@
       justify-content: center;
       text-align: center;
       color: #111827;
-      font-size: 13px;
+      font-size: 12px;
       line-height: .95;
       font-weight: 1000;
       text-shadow: 1px 1px rgba(255,255,255,.65);
@@ -236,17 +236,17 @@
       line-height: 1.22;
       font-weight: 800;
       display: none;
-      z-index: 80;
+      z-index: 90;
     }
     .character.show-quote .quote-bubble { display: block; }
     .quote-name { display: block; margin-bottom: 5px; color: #ec4899; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
     .bubble-label { display: inline-block; margin-bottom: 6px; padding: 3px 8px; border-radius: 999px; background: #fef3c7; border: 2px solid #111827; font-size: 12px; font-weight: 1000; }
     .bubble-text { display: block; }
 
-    .winner-modal {
+    .modal {
       position: fixed;
       inset: 0;
-      z-index: 100;
+      z-index: 120;
       display: none;
       align-items: center;
       justify-content: center;
@@ -254,29 +254,32 @@
       text-align: center;
       padding: 20px;
     }
-    .winner-card {
-      width: min(92vw, 680px);
+    .modal-card {
+      width: min(92vw, 720px);
+      max-height: 88vh;
+      overflow-y: auto;
       padding: 34px;
       border-radius: 34px;
       background: white;
       box-shadow: 0 25px 70px rgba(0,0,0,.35);
       border: 8px solid #fde047;
     }
-    .winner-card h2 { margin: 0 0 10px; font-size: clamp(30px, 7vw, 72px); color: #ec4899; }
-    .winner-name-big { font-size: clamp(44px, 10vw, 104px); font-weight: 1000; color: #0ea5e9; text-shadow: 4px 4px #fde047; }
-    .winner-prize-big { margin-top: 12px; font-size: clamp(22px, 4vw, 42px); font-weight: 900; }
-    .winners-list-card { max-height: 88vh; overflow-y: auto; }
+    .modal-card h2 { margin: 0 0 10px; font-size: clamp(30px, 7vw, 72px); color: #ec4899; }
     .winners-list-big { margin-top: 16px; display: grid; gap: 12px; font-size: clamp(20px, 4vw, 36px); }
     .winner-row { padding: 14px; border: 4px solid #111827; border-radius: 22px; background: #fef3c7; box-shadow: 0 6px 0 #fbbf24; }
     .winner-row span { color: #ec4899; font-weight: 1000; }
-    .confetti { position: fixed; top: -20px; width: 12px; height: 18px; opacity: .9; z-index: 110; animation: fall 2.5s linear forwards; }
+
+    .confetti { position: fixed; top: -20px; width: 12px; height: 18px; opacity: .9; z-index: 130; animation: fall 4s linear forwards; }
     @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
 
     @media (max-width: 760px) {
       .sheet-input { width: 92vw; }
-      .character { width: 96px; height: 165px; }
+      .character { width: 96px; height: 190px; }
       .head { width: 60px; height: 60px; }
       .name-tag { top: 68px; width: 72px; height: 58px; font-size: 10px; }
+      .winner-chain { top: 122px; width: 90px; }
+      .chain-loop { width: 60px; height: 24px; border-width: 6px; }
+      .chain-medal { width: 84px; height: 44px; font-size: 10px; }
       .quote-bubble { left: 55px; top: -40px; width: 190px; font-size: 13px; }
       .arm { top: 76px; height: 42px; }
       .arm.left { left: 18px; }
@@ -299,32 +302,21 @@
     <button class="btn dark" id="clearBtn">Clear</button>
   </div>
 
-  <button class="celebrate-refresh" id="refreshBtn">
-    🎉 Celebrating the Staff 🎉
-    <span>tap to refresh the page</span>
-  </button>
-
-  <button class="winners-bar" id="showWinnersBtn">🏆 Raffle Winners</button>
+  <button class="celebrate-refresh" id="refreshBtn">🎉 Celebrating the Staff 🎉<span>tap to refresh the page</span></button>
+  <button class="winners-button" id="showWinnersBtn">🏆 Raffle Winners</button>
   <div class="footer-note">Tap a selfie to reveal their message 👀</div>
 
-  <div class="winner-modal" id="winnerModal">
-    <div class="winner-card">
-      <h2>Raffle Winner!</h2>
-      <div class="winner-name-big" id="winnerNameBig">Name</div>
-      <div class="winner-prize-big" id="winnerPrizeBig">Prize</div>
-      <button class="btn pink" id="closeWinnerBtn" style="margin-top:22px;">Close</button>
-    </div>
-  </div>
-
-  <div class="winner-modal" id="winnersListModal">
-    <div class="winner-card winners-list-card">
+  <div class="modal" id="winnersModal">
+    <div class="modal-card">
       <h2>🏆 Raffle Winners</h2>
-      <div id="winnersListBig" class="winners-list-big">No winners yet</div>
-      <button class="btn pink" id="closeWinnersListBtn" style="margin-top:22px;">Back to Parade</button>
+      <div id="winnersListBig" class="winners-list-big"><div class="winner-row">No winners yet</div></div>
+      <button class="btn pink" id="closeWinnersBtn" style="margin-top:22px;">Back to Parade</button>
     </div>
   </div>
 
   <script>
+    const DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwz4lMDeYja7-Vluu-B8-StkdVcoMMQSS2-nYsrQxtOSm4SK-IwmJhSpvUlqK5TqrkHZKIVEz_RihC/pub?output=csv';
+    const MAX_PEOPLE = 60;
     const stage = document.getElementById('stage');
     const adminBar = document.getElementById('adminBar');
     const sheetUrlInput = document.getElementById('sheetUrl');
@@ -332,18 +324,12 @@
     const photoInput = document.getElementById('photoInput');
     const addWinnerBtn = document.getElementById('addWinnerBtn');
     const clearBtn = document.getElementById('clearBtn');
-    const winnersList = null;
-    const winnerModal = document.getElementById('winnerModal');
-    const winnerNameBig = document.getElementById('winnerNameBig');
-    const winnerPrizeBig = document.getElementById('winnerPrizeBig');
-    const closeWinnerBtn = document.getElementById('closeWinnerBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
     const showWinnersBtn = document.getElementById('showWinnersBtn');
-    const winnersListModal = document.getElementById('winnersListModal');
+    const winnersModal = document.getElementById('winnersModal');
     const winnersListBig = document.getElementById('winnersListBig');
-    const closeWinnersListBtn = document.getElementById('closeWinnersListBtn');
+    const closeWinnersBtn = document.getElementById('closeWinnersBtn');
 
-    const DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwz4lMDeYja7-Vluu-B8-StkdVcoMMQSS2-nYsrQxtOSm4SK-IwmJhSpvUlqK5TqrkHZKIVEz_RihC/pub?output=csv';
-    const MAX_PEOPLE = 60;
     let people = [];
     let winners = [];
     const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
@@ -355,93 +341,47 @@
         return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
       });
     }
+    function fallbackFace() {
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="white"/><circle cx="100" cy="100" r="78" fill="#fde68a"/><circle cx="75" cy="85" r="10" fill="#111827"/><circle cx="125" cy="85" r="10" fill="#111827"/><path d="M65 120 Q100 150 135 120" stroke="#111827" stroke-width="9" fill="none" stroke-linecap="round"/></svg>');
+    }
     function driveImage(url) {
       if (!url) return '';
       const text = String(url).trim();
-
-      // Google Forms file uploads often save as Drive links.
-      // The file must be shared as "Anyone with the link can view" or browsers will block it.
       const idMatch = text.match(/[?&]id=([^&]+)/) || text.match(/\/d\/([^/]+)/);
-
-      if (idMatch && idMatch[1]) {
-        const fileId = idMatch[1];
-        return 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w500';
-      }
-
+      if (idMatch && idMatch[1]) return 'https://drive.google.com/thumbnail?id=' + idMatch[1] + '&sz=w500';
       return text;
-    }
-
-    function driveAltImages(url) {
-      const text = String(url || '').trim();
-      const idMatch = text.match(/[?&]id=([^&]+)/) || text.match(/\/d\/([^/]+)/);
-      if (!idMatch || !idMatch[1]) return [];
-      const fileId = idMatch[1];
-      return [
-        'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w500',
-        'https://lh3.googleusercontent.com/d/' + fileId + '=w500',
-        'https://drive.google.com/uc?export=view&id=' + fileId,
-        'https://drive.google.com/uc?id=' + fileId
-      ];
-    }
-    function fallbackFace() {
-      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="white"/><circle cx="100" cy="100" r="78" fill="#fde68a"/><circle cx="75" cy="85" r="10" fill="#111827"/><circle cx="125" cy="85" r="10" fill="#111827"/><path d="M65 120 Q100 150 135 120" stroke="#111827" stroke-width="9" fill="none" stroke-linecap="round"/></svg>');
     }
 
     function makeCharacter(data) {
       const name = data.name || 'Staff';
       const quote = data.quote || 'Happy Staff Appreciation Week!';
       const would = data.wouldYouRather || '';
-      const src = data.src || fallbackFace();
       const isWinner = String(data.raffleWinner || '').trim().toLowerCase() === 'yes';
-      const prizeBag = data.prizeBag || '';
-      const originalSrc = data.originalSrc || data.src || '';
-
       const el = document.createElement('div');
       el.className = isWinner ? 'character is-winner' : 'character';
       el.dataset.mode = 'quote';
       el.innerHTML =
-        '<div class="quote-bubble">' +
-          '<span class="quote-name">' + escapeHtml(name) + '</span>' +
-          '<span class="bubble-label">💬 Quote</span>' +
-          '<span class="bubble-text">“' + escapeHtml(quote) + '”</span>' +
-        '</div>' +
+        '<div class="quote-bubble"><span class="quote-name">' + escapeHtml(name) + '</span><span class="bubble-label">💬 Quote</span><span class="bubble-text">“' + escapeHtml(quote) + '”</span></div>' +
         '<div class="head"><img alt="' + escapeHtml(name) + '"></div>' +
-        '<div class="winner-chain"><div class="chain-loop"></div><div class="chain-medal">RAFFLE<br>WINNER</div></div>' +
         '<div class="name-tag">' + escapeHtml(name) + '</div>' +
+        '<div class="winner-chain"><div class="chain-loop"></div><div class="chain-medal">RAFFLE<br>WINNER</div></div>' +
         '<div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div>';
 
       const img = el.querySelector('img');
-      img.dataset.tryIndex = '0';
-      img.dataset.alts = JSON.stringify(driveAltImages(originalSrc));
-      img.src = src;
-      img.onerror = function() {
-        const alts = JSON.parse(img.dataset.alts || '[]');
-        const nextIndex = Number(img.dataset.tryIndex || '0');
-        if (nextIndex < alts.length) {
-          img.dataset.tryIndex = String(nextIndex + 1);
-          img.src = alts[nextIndex];
-        } else {
-          img.src = fallbackFace();
-        }
-      }; 
+      img.src = data.src || fallbackFace();
+      img.onerror = function() { img.src = fallbackFace(); };
 
       el.addEventListener('click', function(event) {
         event.stopPropagation();
-        document.querySelectorAll('.character.show-quote').forEach(function(c) {
-          if (c !== el) c.classList.remove('show-quote');
-        });
+        document.querySelectorAll('.character.show-quote').forEach(function(c) { if (c !== el) c.classList.remove('show-quote'); });
         const label = el.querySelector('.bubble-label');
         const text = el.querySelector('.bubble-text');
-        const hasWould = would.trim().length > 0;
-
         if (!el.classList.contains('show-quote')) {
           el.dataset.mode = 'quote';
           label.textContent = '💬 Quote';
           text.textContent = '“' + quote + '”';
           el.classList.add('show-quote');
-          return;
-        }
-        if (hasWould && el.dataset.mode === 'quote') {
+        } else if (would && el.dataset.mode === 'quote') {
           el.dataset.mode = 'would';
           label.textContent = '🤔 Would You Rather';
           text.textContent = would;
@@ -455,11 +395,8 @@
       stage.appendChild(el);
       people.push({
         el: el,
-        name: name,
-        raffleWinner: isWinner,
-        prizeBag: prizeBag,
         x: random(30, Math.max(31, window.innerWidth - 170)),
-        y: random(120, Math.max(121, window.innerHeight - 245)),
+        y: random(140, Math.max(141, window.innerHeight - 250)),
         vx: random(-1.7, 1.7) || 1,
         vy: random(-1.2, 1.2) || 1,
         scale: random(.82, 1.12),
@@ -470,16 +407,15 @@
     function clearAll() {
       people.forEach(function(p) { p.el.remove(); });
       people = [];
+      winners = [];
+      renderWinners();
     }
 
     function parseCSV(text) {
       const rows = [];
-      let row = [];
-      let cell = '';
-      let quoteMode = false;
+      let row = [], cell = '', quoteMode = false;
       for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const next = text[i + 1];
+        const char = text[i], next = text[i + 1];
         if (char === '"' && quoteMode && next === '"') { cell += '"'; i++; }
         else if (char === '"') quoteMode = !quoteMode;
         else if (char === ',' && !quoteMode) { row.push(cell); cell = ''; }
@@ -497,47 +433,37 @@
       try {
         const response = await fetch(csvUrl);
         if (!response.ok) throw new Error('Could not load sheet.');
-        const rows = parseCSV(await response.text()).filter(function(r) {
-          return r.some(function(cell) { return String(cell).trim() !== ''; });
-        });
+        const rows = parseCSV(await response.text()).filter(function(r) { return r.some(function(c) { return String(c).trim() !== ''; }); });
         if (rows.length < 2) return;
-
         const headers = rows[0].map(function(h) { return String(h).trim().toLowerCase(); });
         const nameIndex = headers.findIndex(function(h) { return h.includes('name'); });
         const quoteIndex = headers.findIndex(function(h) { return h.includes('quote'); });
         const wouldIndex = headers.findIndex(function(h) { return h.includes('would'); });
-        const imageIndex = headers.findIndex(function(h) { return h.includes('imageurl') || h.includes('image url') || h.includes('photo') || h.includes('selfie') || h.includes('pic'); });
+        const imageIndex = headers.findIndex(function(h) { return h.includes('photo') || h.includes('selfie') || h.includes('pic') || h.includes('image'); });
         const raffleIndex = headers.findIndex(function(h) { return h.includes('raffle winner'); });
         const prizeIndex = headers.findIndex(function(h) { return h.includes('prize'); });
         if (nameIndex === -1) throw new Error('Missing Name column.');
 
-        clearAll();
+        people.forEach(function(p) { p.el.remove(); });
+        people = [];
         winners = [];
         rows.slice(1, MAX_PEOPLE + 1).forEach(function(row) {
           const personName = row[nameIndex] || 'Staff';
           const raffleValue = raffleIndex >= 0 ? row[raffleIndex] : '';
           const prizeValue = prizeIndex >= 0 ? row[prizeIndex] : '';
-          const isRaffleWinner = String(raffleValue || '').trim().toLowerCase() === 'yes';
-
-          if (isRaffleWinner) {
-            winners.push({ name: personName, prize: prizeValue || 'Prize Bag' });
-          }
-
+          if (String(raffleValue || '').trim().toLowerCase() === 'yes') winners.push({ name: personName, prize: prizeValue || 'Prize Bag' });
           makeCharacter({
             name: personName,
             quote: quoteIndex >= 0 ? row[quoteIndex] : '',
             wouldYouRather: wouldIndex >= 0 ? row[wouldIndex] : '',
             src: imageIndex >= 0 ? driveImage(row[imageIndex]) : fallbackFace(),
-            originalSrc: imageIndex >= 0 ? row[imageIndex] : '',
-            raffleWinner: raffleValue,
-            prizeBag: prizeValue
+            raffleWinner: raffleValue
           });
         });
         renderWinners();
       } catch (err) {
         console.error(err);
         if (isAdmin) alert(err.message);
-        
       }
     }
 
@@ -548,37 +474,32 @@
           const name = prompt('Name?', 'Staff') || 'Staff';
           const quote = prompt('Quote?', 'Thank you for making our school amazing!') || '';
           const wouldYouRather = prompt('Would You Rather answer?', '') || '';
-          makeCharacter({ src: e.target.result, name: name, quote: quote, wouldYouRather: wouldYouRather, raffleWinner: '', prizeBag: '' });
+          makeCharacter({ src: e.target.result, name: name, quote: quote, wouldYouRather: wouldYouRather, raffleWinner: '' });
         };
         reader.readAsDataURL(file);
       });
     }
 
     function renderWinners() {
-      const html = winners.length
-        ? winners.map(function(w) {
-            return '<div class="winner-row">🎉 <strong>' + escapeHtml(w.name) + '</strong><br><span>' + escapeHtml(w.prize) + '</span></div>';
-          }).join('')
+      winnersListBig.innerHTML = winners.length
+        ? winners.map(function(w) { return '<div class="winner-row">🎉 <strong>' + escapeHtml(w.name) + '</strong><br><span>' + escapeHtml(w.prize) + '</span></div>'; }).join('')
         : '<div class="winner-row">No winners yet</div>';
-
-      if (winnersListBig) winnersListBig.innerHTML = html;
-    }).join('  •  ') : 'None yet';
     }
+
     function addWinner() {
       const name = prompt('Winner name:', 'Cafeteria Lady');
       if (!name) return;
       const prize = prompt('Prize:', 'Small Red Bag') || 'Prize';
       winners.push({ name: name, prize: prize });
       renderWinners();
-      winnerNameBig.textContent = name;
-      winnerPrizeBig.textContent = prize;
-      winnerModal.style.display = 'flex';
-      launchConfetti();
+      winnersModal.style.display = 'flex';
+      launchConfetti(3);
     }
-    function launchConfetti(duration) {
+
+    function launchConfetti(bursts) {
       const colors = ['#f43f5e', '#0ea5e9', '#22c55e', '#fde047', '#a855f7', '#f97316'];
-      const totalBursts = duration || 1;
-      let burst = 0;
+      let count = 0;
+      const total = bursts || 1;
       const timer = setInterval(function() {
         for (let i = 0; i < 70; i++) {
           const piece = document.createElement('div');
@@ -587,62 +508,44 @@
           piece.style.background = colors[Math.floor(Math.random() * colors.length)];
           piece.style.animationDelay = random(0, .4) + 's';
           document.body.appendChild(piece);
-          setTimeout(function() { piece.remove(); }, 4600);
+          setTimeout(function() { piece.remove(); }, 4700);
         }
-        burst++;
-        if (burst >= totalBursts) clearInterval(timer);
+        count++;
+        if (count >= total) clearInterval(timer);
       }, 450);
     }
 
-    
-
     function animate() {
-      const topSafe = isAdmin ? 140 : 130;
-      const bottomSafe = window.innerHeight - 225;
+      const topSafe = isAdmin ? 150 : 140;
+      const bottomSafe = window.innerHeight - 250;
       const rightSafe = window.innerWidth - 145;
       people.forEach(function(p, i) {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.wobble += 0.06;
+        p.x += p.vx; p.y += p.vy; p.wobble += 0.06;
         if (p.x < 0 || p.x > rightSafe) p.vx *= -1;
         if (p.y < topSafe || p.y > bottomSafe) p.vy *= -1;
         for (let j = i + 1; j < people.length; j++) {
-          const q = people[j];
-          const dx = p.x - q.x;
-          const dy = p.y - q.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 105) {
-            p.vx += dx / 130; p.vy += dy / 170;
-            q.vx -= dx / 130; q.vy -= dy / 170;
-          }
+          const q = people[j], dx = p.x - q.x, dy = p.y - q.y, dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 105) { p.vx += dx / 130; p.vy += dy / 170; q.vx -= dx / 130; q.vy -= dy / 170; }
         }
         p.vx = Math.max(-2.4, Math.min(2.4, p.vx));
         p.vy = Math.max(-1.8, Math.min(1.8, p.vy));
-        const bounce = Math.sin(p.wobble) * 5;
-        const lean = p.vx > 0 ? 3 : -3;
-        p.el.style.transform = 'translate(' + p.x + 'px, ' + (p.y + bounce) + 'px) scale(' + p.scale + ') rotate(' + lean + 'deg)';
+        p.el.style.transform = 'translate(' + p.x + 'px, ' + (p.y + Math.sin(p.wobble) * 5) + 'px) scale(' + p.scale + ') rotate(' + (p.vx > 0 ? 3 : -3) + 'deg)';
       });
       requestAnimationFrame(animate);
     }
 
-    document.body.addEventListener('click', function() {
-      document.querySelectorAll('.character.show-quote').forEach(function(c) { c.classList.remove('show-quote'); });
-    });
+    document.body.addEventListener('click', function() { document.querySelectorAll('.character.show-quote').forEach(function(c) { c.classList.remove('show-quote'); }); });
     loadSheetBtn.addEventListener('click', function() { loadSheetCSV(); });
     photoInput.addEventListener('change', function(e) { addPhotos(e.target.files); });
     addWinnerBtn.addEventListener('click', addWinner);
-    clearBtn.addEventListener('click', function() { clearAll(); winners = []; renderWinners(); });
-    closeWinnerBtn.addEventListener('click', function() { winnerModal.style.display = 'none'; });
-    showWinnersBtn.addEventListener('click', function() { renderWinners(); winnersListModal.style.display = 'flex'; launchConfetti(2); });
-    closeWinnersListBtn.addEventListener('click', function() { winnersListModal.style.display = 'none'; });
-    document.getElementById('refreshBtn').addEventListener('click', function() {
-      launchConfetti(4);
-      setTimeout(function() { window.location.reload(); }, 1600);
-    });
+    clearBtn.addEventListener('click', clearAll);
+    showWinnersBtn.addEventListener('click', function() { renderWinners(); winnersModal.style.display = 'flex'; launchConfetti(2); });
+    closeWinnersBtn.addEventListener('click', function() { winnersModal.style.display = 'none'; });
+    refreshBtn.addEventListener('click', function() { launchConfetti(4); setTimeout(function() { window.location.reload(); }, 1600); });
 
     renderWinners();
     loadSheetCSV(DEFAULT_CSV);
-    setTimeout(function() { launchConfetti(3); }, 500);
+    setTimeout(function() { launchConfetti(3); }, 700);
     animate();
   </script>
 </body>

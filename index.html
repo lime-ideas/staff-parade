@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Appreciation Selfie Parade</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #fff7cc, #ffd6ec 35%, #bde7ff 70%, #d7ffd9);
+      color: #111827;
+    }
+    #stage { position: fixed; inset: 0; overflow: hidden; }
+
+    .admin-bar {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      display: none;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: min(96vw, 1100px);
+      padding: 10px;
+      background: rgba(255,255,255,.94);
+      border-radius: 24px;
+      box-shadow: 0 10px 28px rgba(0,0,0,.18);
+    }
+    .admin-bar.show { display: flex; }
+
+    .sheet-input {
+      width: min(430px, 86vw);
+      padding: 10px 13px;
+      border: 2px solid #cbd5e1;
+      border-radius: 999px;
+      font-weight: 700;
+      outline: none;
+    }
+    .btn, label.upload-btn {
+      border: 0;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: #0ea5e9;
+      color: white;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #0369a1;
+      font-size: 13px;
+    }
+    .btn:active, label.upload-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #0369a1; }
+    .btn.purple { background: #8b5cf6; box-shadow: 0 5px 0 #5b21b6; }
+    .btn.green { background: #22c55e; box-shadow: 0 5px 0 #15803d; }
+    .btn.pink { background: #ec4899; box-shadow: 0 5px 0 #9d174d; }
+    .btn.dark { background: #334155; box-shadow: 0 5px 0 #0f172a; }
+    input[type="file"] { display: none; }
+
+    .winners-bar {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      background: rgba(255,255,255,.94);
+      border: 4px solid #111827;
+      border-radius: 20px;
+      padding: 10px 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.2);
+      max-width: 92vw;
+      text-align: center;
+      font-size: clamp(14px, 2vw, 20px);
+      font-weight: 900;
+    }
+    .footer-note {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      background: rgba(255,255,255,.82);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-weight: 900;
+      font-size: 13px;
+      box-shadow: 0 5px 20px rgba(0,0,0,.12);
+      text-align: center;
+    }
+
+    .character {
+      position: absolute;
+      width: 130px;
+      height: 210px;
+      transform-origin: center bottom;
+      will-change: transform;
+      user-select: none;
+      cursor: pointer;
+    }
+    .head {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 5px solid white;
+      box-shadow: 0 5px 12px rgba(0,0,0,.25);
+      background: white;
+      z-index: 4;
+    }
+    .head img { width: 100%; height: 100%; object-fit: cover; }
+    .name-tag {
+      position: absolute;
+      top: 92px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 96px;
+      height: 74px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #ffffff, #e0f2fe);
+      border: 4px solid #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 1000;
+      text-align: center;
+      padding: 5px;
+      z-index: 3;
+      box-shadow: inset 0 -5px rgba(0,0,0,.08), 0 5px 10px rgba(0,0,0,.12);
+      overflow: hidden;
+    }
+    .arm, .leg {
+      position: absolute;
+      background: #111827;
+      border-radius: 999px;
+      transform-origin: top center;
+      animation: swing .55s infinite alternate ease-in-out;
+      z-index: 1;
+    }
+    .arm { width: 9px; height: 56px; top: 98px; }
+    .arm.left { left: 24px; }
+    .arm.right { right: 24px; animation-delay: -.55s; }
+    .leg { width: 10px; height: 54px; top: 158px; }
+    .leg.left { left: 46px; animation-delay: -.55s; }
+    .leg.right { right: 46px; }
+    @keyframes swing { from { rotate: -10deg; } to { rotate: 10deg; } }
+
+    .quote-bubble {
+      position: absolute;
+      left: 88px;
+      top: -12px;
+      width: 240px;
+      min-height: 76px;
+      padding: 13px 15px;
+      border-radius: 22px 22px 22px 6px;
+      background: #ffffff;
+      border: 4px solid #111827;
+      box-shadow: 0 12px 24px rgba(0,0,0,.24);
+      font-size: 15px;
+      line-height: 1.22;
+      font-weight: 800;
+      display: none;
+      z-index: 80;
+    }
+    .character.show-quote .quote-bubble { display: block; }
+    .quote-name { display: block; margin-bottom: 5px; color: #ec4899; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+    .bubble-label { display: inline-block; margin-bottom: 6px; padding: 3px 8px; border-radius: 999px; background: #fef3c7; border: 2px solid #111827; font-size: 12px; font-weight: 1000; }
+    .bubble-text { display: block; }
+
+    .winner-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15,23,42,.55);
+      text-align: center;
+      padding: 20px;
+    }
+    .winner-card {
+      width: min(92vw, 680px);
+      padding: 34px;
+      border-radius: 34px;
+      background: white;
+      box-shadow: 0 25px 70px rgba(0,0,0,.35);
+      border: 8px solid #fde047;
+    }
+    .winner-card h2 { margin: 0 0 10px; font-size: clamp(30px, 7vw, 72px); color: #ec4899; }
+    .winner-name-big { font-size: clamp(44px, 10vw, 104px); font-weight: 1000; color: #0ea5e9; text-shadow: 4px 4px #fde047; }
+    .winner-prize-big { margin-top: 12px; font-size: clamp(22px, 4vw, 42px); font-weight: 900; }
+    .confetti { position: fixed; top: -20px; width: 12px; height: 18px; opacity: .9; z-index: 110; animation: fall 2.5s linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+    @media (max-width: 760px) {
+      .sheet-input { width: 92vw; }
+      .character { width: 96px; height: 165px; }
+      .head { width: 60px; height: 60px; }
+      .name-tag { top: 68px; width: 72px; height: 58px; font-size: 10px; }
+      .quote-bubble { left: 55px; top: -40px; width: 190px; font-size: 13px; }
+      .arm { top: 76px; height: 42px; }
+      .arm.left { left: 18px; }
+      .arm.right { right: 18px; }
+      .leg { top: 128px; height: 40px; }
+      .leg.left { left: 34px; }
+      .leg.right { right: 34px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+
+  <div class="admin-bar" id="adminBar">
+    <input class="sheet-input" id="sheetUrl" placeholder="Paste published Google Sheet CSV link" />
+    <button class="btn purple" id="loadSheetBtn">Load Responses</button>
+    <label class="upload-btn" for="photoInput">Manual Upload</label>
+    <input id="photoInput" type="file" accept="image/*" multiple />
+    <button class="btn green" id="addWinnerBtn">Add Winner</button>
+    <button class="btn pink" id="demoBtn">Demo</button>
+    <button class="btn dark" id="clearBtn">Clear</button>
+  </div>
+
+  <div class="winners-bar">🎉 Raffle Winners: <span id="winnersList">None yet</span></div>
+  <div class="footer-note">Tap a selfie to reveal their message 👀</div>
+
+  <div class="winner-modal" id="winnerModal">
+    <div class="winner-card">
+      <h2>Raffle Winner!</h2>
+      <div class="winner-name-big" id="winnerNameBig">Name</div>
+      <div class="winner-prize-big" id="winnerPrizeBig">Prize</div>
+      <button class="btn pink" id="closeWinnerBtn" style="margin-top:22px;">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const stage = document.getElementById('stage');
+    const adminBar = document.getElementById('adminBar');
+    const sheetUrlInput = document.getElementById('sheetUrl');
+    const loadSheetBtn = document.getElementById('loadSheetBtn');
+    const photoInput = document.getElementById('photoInput');
+    const addWinnerBtn = document.getElementById('addWinnerBtn');
+    const demoBtn = document.getElementById('demoBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const winnersList = document.getElementById('winnersList');
+    const winnerModal = document.getElementById('winnerModal');
+    const winnerNameBig = document.getElementById('winnerNameBig');
+    const winnerPrizeBig = document.getElementById('winnerPrizeBig');
+    const closeWinnerBtn = document.getElementById('closeWinnerBtn');
+
+    const DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwz4lMDeYja7-Vluu-B8-StkdVcoMMQSS2-nYsrQxtOSm4SK-IwmJhSpvUlqK5TqrkHZKIVEz_RihC/pub?output=csv';
+    const MAX_PEOPLE = 60;
+    let people = [];
+    let winners = [];
+    const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
+    if (isAdmin) adminBar.classList.add('show');
+
+    function random(min, max) { return Math.random() * (max - min) + min; }
+    function escapeHtml(value) {
+      return String(value || '').replace(/[&<>"']/g, function(c) {
+        return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+      });
+    }
+    function driveImage(url) {
+      if (!url) return '';
+      const text = String(url).trim();
+      const idMatch = text.match(/[?&]id=([^&]+)/) || text.match(/\/d\/([^/]+)/);
+      if (idMatch && idMatch[1]) return 'https://drive.google.com/uc?export=view&id=' + idMatch[1];
+      return text;
+    }
+    function fallbackFace() {
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="white"/><circle cx="100" cy="100" r="78" fill="#fde68a"/><circle cx="75" cy="85" r="10" fill="#111827"/><circle cx="125" cy="85" r="10" fill="#111827"/><path d="M65 120 Q100 150 135 120" stroke="#111827" stroke-width="9" fill="none" stroke-linecap="round"/></svg>');
+    }
+
+    function makeCharacter(data) {
+      const name = data.name || 'Staff';
+      const quote = data.quote || 'Happy Staff Appreciation Week!';
+      const would = data.wouldYouRather || '';
+      const src = data.src || fallbackFace();
+
+      const el = document.createElement('div');
+      el.className = 'character';
+      el.dataset.mode = 'quote';
+      el.innerHTML =
+        '<div class="quote-bubble">' +
+          '<span class="quote-name">' + escapeHtml(name) + '</span>' +
+          '<span class="bubble-label">💬 Quote</span>' +
+          '<span class="bubble-text">“' + escapeHtml(quote) + '”</span>' +
+        '</div>' +
+        '<div class="head"><img alt="' + escapeHtml(name) + '"></div>' +
+        '<div class="name-tag">' + escapeHtml(name) + '</div>' +
+        '<div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div>';
+
+      const img = el.querySelector('img');
+      img.src = src;
+      img.onerror = function() { img.src = fallbackFace(); };
+
+      el.addEventListener('click', function(event) {
+        event.stopPropagation();
+        document.querySelectorAll('.character.show-quote').forEach(function(c) {
+          if (c !== el) c.classList.remove('show-quote');
+        });
+        const label = el.querySelector('.bubble-label');
+        const text = el.querySelector('.bubble-text');
+        const hasWould = would.trim().length > 0;
+
+        if (!el.classList.contains('show-quote')) {
+          el.dataset.mode = 'quote';
+          label.textContent = '💬 Quote';
+          text.textContent = '“' + quote + '”';
+          el.classList.add('show-quote');
+          return;
+        }
+        if (hasWould && el.dataset.mode === 'quote') {
+          el.dataset.mode = 'would';
+          label.textContent = '🤔 Would You Rather';
+          text.textContent = would;
+        } else {
+          el.dataset.mode = 'quote';
+          label.textContent = '💬 Quote';
+          text.textContent = '“' + quote + '”';
+        }
+      });
+
+      stage.appendChild(el);
+      people.push({
+        el: el,
+        name: name,
+        x: random(30, Math.max(31, window.innerWidth - 170)),
+        y: random(120, Math.max(121, window.innerHeight - 245)),
+        vx: random(-1.7, 1.7) || 1,
+        vy: random(-1.2, 1.2) || 1,
+        scale: random(.82, 1.12),
+        wobble: random(0, Math.PI * 2)
+      });
+    }
+
+    function clearAll() {
+      people.forEach(function(p) { p.el.remove(); });
+      people = [];
+    }
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let cell = '';
+      let quoteMode = false;
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+        if (char === '"' && quoteMode && next === '"') { cell += '"'; i++; }
+        else if (char === '"') quoteMode = !quoteMode;
+        else if (char === ',' && !quoteMode) { row.push(cell); cell = ''; }
+        else if ((char === '\n' || char === '\r') && !quoteMode) {
+          if (cell || row.length) { row.push(cell); rows.push(row); row = []; cell = ''; }
+          if (char === '\r' && next === '\n') i++;
+        } else cell += char;
+      }
+      if (cell || row.length) { row.push(cell); rows.push(row); }
+      return rows;
+    }
+
+    async function loadSheetCSV(url) {
+      const csvUrl = url || sheetUrlInput.value.trim() || DEFAULT_CSV;
+      try {
+        const response = await fetch(csvUrl);
+        if (!response.ok) throw new Error('Could not load sheet.');
+        const rows = parseCSV(await response.text()).filter(function(r) {
+          return r.some(function(cell) { return String(cell).trim() !== ''; });
+        });
+        if (rows.length < 2) return;
+
+        const headers = rows[0].map(function(h) { return String(h).trim().toLowerCase(); });
+        const nameIndex = headers.findIndex(function(h) { return h.includes('name'); });
+        const quoteIndex = headers.findIndex(function(h) { return h.includes('quote'); });
+        const wouldIndex = headers.findIndex(function(h) { return h.includes('would'); });
+        const imageIndex = headers.findIndex(function(h) { return h.includes('imageurl') || h.includes('image url') || h.includes('photo') || h.includes('selfie') || h.includes('pic'); });
+        if (nameIndex === -1) throw new Error('Missing Name column.');
+
+        clearAll();
+        rows.slice(1, MAX_PEOPLE + 1).forEach(function(row) {
+          makeCharacter({
+            name: row[nameIndex] || 'Staff',
+            quote: quoteIndex >= 0 ? row[quoteIndex] : '',
+            wouldYouRather: wouldIndex >= 0 ? row[wouldIndex] : '',
+            src: imageIndex >= 0 ? driveImage(row[imageIndex]) : fallbackFace()
+          });
+        });
+      } catch (err) {
+        console.error(err);
+        if (isAdmin) alert(err.message);
+        if (people.length === 0) createDemoPeople();
+      }
+    }
+
+    function addPhotos(files) {
+      Array.from(files).forEach(function(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const name = prompt('Name?', 'Staff') || 'Staff';
+          const quote = prompt('Quote?', 'Thank you for making our school amazing!') || '';
+          const wouldYouRather = prompt('Would You Rather answer?', '') || '';
+          makeCharacter({ src: e.target.result, name: name, quote: quote, wouldYouRather: wouldYouRather });
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderWinners() {
+      winnersList.textContent = winners.length ? winners.map(function(w) { return w.name + ' — ' + w.prize; }).join('  •  ') : 'None yet';
+    }
+    function addWinner() {
+      const name = prompt('Winner name:', 'Cafeteria Lady');
+      if (!name) return;
+      const prize = prompt('Prize:', 'Small Red Bag') || 'Prize';
+      winners.push({ name: name, prize: prize });
+      renderWinners();
+      winnerNameBig.textContent = name;
+      winnerPrizeBig.textContent = prize;
+      winnerModal.style.display = 'flex';
+      launchConfetti();
+    }
+    function launchConfetti() {
+      const colors = ['#f43f5e', '#0ea5e9', '#22c55e', '#fde047', '#a855f7', '#f97316'];
+      for (let i = 0; i < 90; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti';
+        piece.style.left = random(0, 100) + 'vw';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = random(0, .7) + 's';
+        document.body.appendChild(piece);
+        setTimeout(function() { piece.remove(); }, 3200);
+      }
+    }
+
+    function emojiImage(emoji) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 200;
+      canvas.height = 200;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0,0,200,200);
+      ctx.font = '120px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(emoji, 100, 110);
+      return canvas.toDataURL();
+    }
+    function createDemoPeople() {
+      clearAll();
+      const demo = [
+        ['Mrs. Sunshine', 'Coffee, kindness, and copy paper save the day.', 'Starbucks', '😀'],
+        ['Mr. High Five', 'Teamwork makes the school work!', 'Donuts', '😎'],
+        ['Cafeteria Lady', 'Serving smiles daily!', 'Small Red Bag', '😄']
+      ];
+      demo.forEach(function(d) {
+        makeCharacter({ src: emojiImage(d[3]), name: d[0], quote: d[1], wouldYouRather: d[2] });
+      });
+    }
+
+    function animate() {
+      const topSafe = isAdmin ? 118 : 65;
+      const bottomSafe = window.innerHeight - 225;
+      const rightSafe = window.innerWidth - 145;
+      people.forEach(function(p, i) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.wobble += 0.06;
+        if (p.x < 0 || p.x > rightSafe) p.vx *= -1;
+        if (p.y < topSafe || p.y > bottomSafe) p.vy *= -1;
+        for (let j = i + 1; j < people.length; j++) {
+          const q = people[j];
+          const dx = p.x - q.x;
+          const dy = p.y - q.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 105) {
+            p.vx += dx / 130; p.vy += dy / 170;
+            q.vx -= dx / 130; q.vy -= dy / 170;
+          }
+        }
+        p.vx = Math.max(-2.4, Math.min(2.4, p.vx));
+        p.vy = Math.max(-1.8, Math.min(1.8, p.vy));
+        const bounce = Math.sin(p.wobble) * 5;
+        const lean = p.vx > 0 ? 3 : -3;
+        p.el.style.transform = 'translate(' + p.x + 'px, ' + (p.y + bounce) + 'px) scale(' + p.scale + ') rotate(' + lean + 'deg)';
+      });
+      requestAnimationFrame(animate);
+    }
+
+    document.body.addEventListener('click', function() {
+      document.querySelectorAll('.character.show-quote').forEach(function(c) { c.classList.remove('show-quote'); });
+    });
+    loadSheetBtn.addEventListener('click', function() { loadSheetCSV(); });
+    photoInput.addEventListener('change', function(e) { addPhotos(e.target.files); });
+    addWinnerBtn.addEventListener('click', addWinner);
+    demoBtn.addEventListener('click', createDemoPeople);
+    clearBtn.addEventListener('click', clearAll);
+    closeWinnerBtn.addEventListener('click', function() { winnerModal.style.display = 'none'; });
+
+    renderWinners();
+    createDemoPeople();
+    if (!window.location.href.includes('preview')) {
+      loadSheetCSV(DEFAULT_CSV);
+    }
+    animate();
+  </script>
+</body>
+</html>

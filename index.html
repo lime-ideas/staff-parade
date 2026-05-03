@@ -1,337 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lime Street Selfie Parade</title>
-  <style>
-    * { box-sizing: border-box; }
-    :root {
-      --grass1:#2f7d32;
-      --grass2:#256d2a;
-      --path1:#9b1c22;
-      --path2:#151515;
-      --yellow:#ffe600;
-      --stone:#6b7280;
-      --dark:#111827;
-      --white:#f8fafc;
-    }
-    body {
-      margin:0;
-      overflow:hidden;
-      background:#111;
-      font-family: monospace, Arial, sans-serif;
-      color:#111;
-      image-rendering: pixelated;
-    }
-    #app {
-      position:fixed;
-      inset:0;
-      overflow:hidden;
-      background:
-        linear-gradient(90deg, transparent 0 calc(100% - 170px), var(--yellow) calc(100% - 170px) 100%),
-        repeating-conic-gradient(var(--grass1) 0 25%, var(--grass2) 0 50%) 0 0 / 64px 64px;
-    }
-    .yellow-lane {
-      position:absolute;
-      right:0;
-      top:0;
-      width:170px;
-      height:100%;
-      background:
-        linear-gradient(90deg, rgba(0,0,0,.18), transparent 20%),
-        repeating-conic-gradient(#ffe600 0 25%, #f3d900 0 50%) 0 0 / 42px 42px;
-      border-left:8px solid #111;
-      z-index:3;
-    }
-    .yellow-lane::after {
-      content:'ENTRY LANE';
-      position:absolute;
-      top:45%;
-      left:50%;
-      transform:translate(-50%,-50%) rotate(90deg);
-      font-size:20px;
-      font-weight:900;
-      letter-spacing:2px;
-      color:#111;
-      opacity:.55;
-      white-space:nowrap;
-    }
-    .path {
-      position:absolute;
-      left:54px;
-      top:118px;
-      right:220px;
-      bottom:70px;
-      border:10px solid #111;
-      background:
-        repeating-conic-gradient(var(--path1) 0 25%, var(--path2) 0 50%) 0 0 / 64px 64px;
-      box-shadow: inset 0 0 0 8px rgba(255,255,255,.08), 12px 12px 0 rgba(0,0,0,.35);
-      z-index:1;
-    }
-    .center-stage {
-      position:absolute;
-      left:calc((100vw - 170px) / 2);
-      top:52%;
-      transform:translate(-50%,-50%);
-      width:min(28vw, 300px);
-      height:min(28vw, 300px);
-      min-width:210px;
-      min-height:210px;
-      background:
-        linear-gradient(45deg, #4b5563 25%, transparent 25%),
-        linear-gradient(-45deg, #4b5563 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #374151 75%),
-        linear-gradient(-45deg, transparent 75%, #374151 75%);
-      background-size:44px 44px;
-      background-position:0 0,0 22px,22px -22px,-22px 0;
-      background-color:#6b7280;
-      border:10px solid #111;
-      box-shadow:10px 10px 0 rgba(0,0,0,.45);
-      z-index:4;
-      display:grid;
-      place-items:center;
-      text-align:center;
-    }
-    .center-stage .school {
-      width:72%;
-      height:72%;
-      border:8px solid #111;
-      background:#9b1c22;
-      box-shadow:6px 6px 0 rgba(0,0,0,.35);
-      display:grid;
-      place-items:center;
-      color:white;
-      font-weight:900;
-      font-size:clamp(18px,3vw,34px);
-      line-height:1;
-      text-shadow:3px 3px #111;
-      padding:12px;
-    }
-    .center-stage .school::before { content:'🐻'; display:block; font-size:48px; text-shadow:none; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STI Staff Excellence - Auto-Reorbit</title>
+    <style>
+        :root {
+            --school-red: #b31b1b;
+            --tech-gold: #d4af37;
+            --bg-dark: #0a0a0a;
+            --ui-border: rgba(255, 255, 255, 0.15);
+        }
 
-    .topbar {
-      position:fixed;
-      top:12px;
-      left:50%;
-      transform:translateX(-50%);
-      z-index:100;
-      display:flex;
-      gap:10px;
-      justify-content:center;
-      align-items:center;
-      width:min(94vw,960px);
-      flex-wrap:wrap;
-    }
-    .top-btn {
-      border:5px solid #111;
-      background:#f8fafc;
-      box-shadow:6px 6px 0 rgba(0,0,0,.55);
-      padding:8px 12px;
-      color:#111;
-      font-size:15px;
-      font-weight:900;
-      font-family:monospace, Arial, sans-serif;
-      cursor:pointer;
-      text-transform:uppercase;
-    }
-    .top-btn.refresh { background:#ffe600; min-width:260px; }
-    .top-btn span { display:block; font-size:9px; opacity:.65; }
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: white;
+        }
 
-    .admin-bar {
-      position:fixed;
-      bottom:10px;
-      left:50%;
-      transform:translateX(-50%);
-      z-index:130;
-      display:none;
-      gap:8px;
-      flex-wrap:wrap;
-      justify-content:center;
-      width:min(96vw,1100px);
-      background:#f8fafc;
-      border:5px solid #111;
-      box-shadow:6px 6px 0 rgba(0,0,0,.55);
-      padding:10px;
-    }
-    .admin-bar input { min-width:360px; padding:10px; border:4px solid #111; font-weight:900; font-family:monospace; }
-    .admin-bar.show { display:flex; }
-    .btn, label.upload-btn {
-      border:4px solid #111;
-      background:#9b1c22;
-      color:white;
-      padding:9px 12px;
-      font-weight:900;
-      font-family:monospace;
-      cursor:pointer;
-      box-shadow:4px 4px 0 rgba(0,0,0,.45);
-    }
-    input[type=file]{display:none;}
+        #canvas-bg { position: absolute; top: 0; left: 0; z-index: 0; }
 
-    .stage { position:absolute; inset:0; z-index:10; }
-    .player {
-      position:absolute;
-      width:58px;
-      height:58px;
-      transform-origin:center;
-      cursor:pointer;
-      z-index:20;
-      image-rendering:pixelated;
-    }
-    .player.spotlight {
-      z-index:180!important;
-      filter: drop-shadow(0 0 0 #fff) drop-shadow(0 0 18px #ffe600) drop-shadow(0 0 28px #ffffff);
-    }
-    .head {
-      position:absolute;
-      top:0;
-      left:0;
-      width:58px;
-      height:58px;
-      border:5px solid #111;
-      background:#e8b98e;
-      overflow:hidden;
-      box-shadow:
-        4px 4px 0 rgba(0,0,0,.45),
-        0 0 0 4px #fff,
-        0 0 0 8px rgba(255,230,0,.85);
-    }
-    .head img { width:100%; height:100%; object-fit:cover; image-rendering:auto; }
-    .name-tag {
-      position:absolute;
-      top:64px;
-      left:50%;
-      transform:translateX(-50%);
-      background:#fff;
-      color:#111;
-      border:3px solid #111;
-      padding:1px 4px;
-      font-size:8px;
-      font-weight:900;
-      max-width:78px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      box-shadow:2px 2px 0 rgba(0,0,0,.4);
-    }
-    .winner-badge {
-      position:absolute;
-      top:-12px;
-      right:-18px;
-      width:48px;
-      height:24px;
-      display:none;
-      place-items:center;
-      background:#fbbf24;
-      border:3px solid #111;
-      color:#111;
-      font-size:7px;
-      font-weight:900;
-      text-align:center;
-      line-height:.85;
-      box-shadow:3px 3px 0 rgba(0,0,0,.45);
-      transform:rotate(10deg);
-    }
-    .is-winner .winner-badge { display:grid; }
+        /* HEADER */
+        #header-banner {
+            position: fixed; top: 15px; right: 20px;
+            text-align: right; z-index: 2005; pointer-events: none;
+        }
+        #header-banner h1 { margin: 0; font-size: 16px; letter-spacing: 2px; color: var(--tech-gold); text-transform: uppercase; }
+        #header-banner p { margin: 2px 0; font-size: 9px; color: #666; }
 
-    .speech {
-      position:fixed;
-      left:50%;
-      bottom:18px;
-      transform:translateX(-50%);
-      z-index:200;
-      display:none;
-      width:min(92vw,740px);
-      background:#fff;
-      color:#111;
-      border:7px solid #111;
-      box-shadow:10px 10px 0 rgba(0,0,0,.55);
-      padding:18px;
-      text-align:center;
-    }
-    .speech.show { display:block; }
-    .speech h2 { margin:0 0 8px; color:#9b1c22; font-size:34px; }
-    .speech p { margin:6px 0; font-size:20px; font-family:Arial,sans-serif; font-weight:900; }
+        /* MENU CONTROLS */
+        #command-menu {
+            position: fixed; top: 15px; left: 15px;
+            width: 220px; z-index: 3000;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .menu-btn {
+            background: rgba(20, 20, 20, 0.8); border: 1px solid var(--ui-border);
+            color: white; padding: 12px; border-radius: 6px;
+            cursor: pointer; font-size: 11px; font-weight: bold;
+            text-align: left; transition: all 0.2s; backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .menu-btn:hover { border-color: var(--tech-gold); color: var(--tech-gold); }
 
-    .modal { position:fixed; inset:0; z-index:220; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.68); padding:20px; }
-    .modal-card { width:min(92vw,760px); max-height:88vh; overflow-y:auto; background:#fff; color:#111; border:8px solid #111; box-shadow:10px 10px 0 rgba(0,0,0,.55); padding:24px; text-align:center; }
-    .modal-card h2 { margin:0 0 16px; color:#9b1c22; font-size:clamp(34px,7vw,68px); }
-    .grid-list { display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); }
-    .list-item { background:#ffe600; border:5px solid #111; box-shadow:5px 5px 0 rgba(0,0,0,.45); padding:12px; font-size:17px; font-weight:900; cursor:pointer; font-family:monospace; }
-    .winner-item { background:#fff1a8; font-size:22px; }
-    .confetti { position:fixed; top:-20px; width:12px; height:18px; z-index:300; animation:fall 4.3s linear forwards; }
-    @keyframes fall { to { transform:translateY(110vh) rotate(720deg); } }
-  </style>
+        #staff-dropdown {
+            max-height: 0; overflow: hidden; background: rgba(15, 15, 15, 0.95);
+            border-radius: 6px; transition: max-height 0.4s ease;
+            display: flex; flex-direction: column;
+        }
+        #staff-dropdown.open { max-height: 350px; overflow-y: auto; border: 1px solid var(--ui-border); }
+        .staff-link { padding: 10px 15px; font-size: 12px; color: #ccc; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .staff-link:hover { background: var(--tech-gold); color: black; }
+
+        /* STAGE & AVATARS */
+        #stage { width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; z-index: 1; }
+        #logo-hub { width: 120px; height: 120px; z-index: 100; pointer-events: none; }
+        
+        .character { 
+            position: absolute; display: flex; flex-direction: column; align-items: center; 
+            cursor: pointer; z-index: 10; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .face { width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; background-size: cover; background-position: center; position: relative; z-index: 5; }
+        
+        /* RADIATING SERVICE RINGS */
+        .service-ring {
+            position: absolute; border-radius: 50%;
+            border: 1px solid var(--tech-gold);
+            opacity: 0; pointer-events: none;
+            transition: all 0.6s ease;
+        }
+        .hero .service-ring {
+            opacity: 0.6;
+            animation: ring-pulse 3s infinite alternate;
+        }
+        @keyframes ring-pulse {
+            from { transform: scale(1); opacity: 0.3; }
+            to { transform: scale(1.15); opacity: 0.8; border-color: var(--school-red); }
+        }
+
+        .winner-glow { border: 3px solid var(--tech-gold) !important; animation: win-pulse 3s infinite ease-in-out; }
+        @keyframes win-pulse { 0%, 100% { box-shadow: 0 0 10px var(--tech-gold); } 50% { box-shadow: 0 0 30px var(--tech-gold); } }
+
+        .character.hero {
+            animation: none !important; transform: translate(0, 0) scale(2.8) !important;
+            top: 50% !important; left: 50% !important; margin-top: -25px; margin-left: -25px; z-index: 9999;
+        }
+
+        /* PROFILE & RAFFLE */
+        #profile-card { 
+            position: fixed; bottom: 20px; left: 20px; width: calc(100% - 40px); max-width: 300px;
+            background: rgba(15,15,15,0.95); border: 1px solid var(--tech-gold); 
+            padding: 20px; border-radius: 8px; display: none; z-index: 4000; backdrop-filter: blur(15px);
+        }
+        #raffle-panel {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 350px; background: rgba(10, 10, 10, 0.98);
+            border: 1px solid var(--tech-gold); border-radius: 12px;
+            padding: 25px; z-index: 5000; display: none; backdrop-filter: blur(20px);
+        }
+
+        @media (max-width: 600px) {
+            .character.hero { transform: translate(0, 0) scale(2.2) !important; }
+        }
+    </style>
 </head>
 <body>
-  <div id="app">
-    <div class="path"></div>
-    <div class="yellow-lane"></div>
-    <div class="center-stage"><div class="school">LIME STREET<br>ELEMENTARY</div></div>
-    <div class="stage" id="stage"></div>
-  </div>
 
-  <div class="topbar">
-    <button class="top-btn refresh" id="refreshBtn">🎉 Celebrating the Staff 🎉<span>refresh the page</span></button>
-    <button class="top-btn" id="winnersBtn">🏆 Winners</button>
-    <button class="top-btn" id="staffBtn">📋 Staff List</button>
-  </div>
+<canvas id="canvas-bg"></canvas>
 
-  <div class="admin-bar" id="adminBar">
-    <input id="sheetUrl" placeholder="Paste published Google Sheet CSV link" />
-    <button class="btn" id="loadBtn">Load</button>
-    <label class="upload-btn" for="photoInput">Manual Upload</label>
-    <input id="photoInput" type="file" accept="image/*" multiple />
-    <button class="btn" id="addWinnerBtn">Add Winner</button>
-    <button class="btn" id="clearBtn">Clear</button>
-  </div>
+<div id="header-banner">
+    <h1>Staff Excellence</h1>
+    <p>STI // APPRECIATION WEEK</p>
+</div>
 
-  <div class="speech" id="speechBox">
-    <h2 id="speechName">Name</h2>
-    <p id="speechQuote">Quote</p>
-    <p id="speechWould"></p>
-    <button class="btn" id="closeSpeechBtn">Back to Parade</button>
-  </div>
+<div id="command-menu">
+    <button class="menu-btn" onclick="location.reload()" style="border-color: var(--tech-gold)">🔄 SYNC LIVE DATA</button>
+    <button class="menu-btn" onclick="toggleRaffle(true)">🏆 RAFFLE WINNERS <span>›</span></button>
+    <button class="menu-btn" onclick="toggleDropdown()">👥 STAFF LIST <span id="drop-arrow">▼</span></button>
+    <div id="staff-dropdown"></div>
+</div>
 
-  <div class="modal" id="staffModal"><div class="modal-card"><h2>📋 Staff List</h2><div class="grid-list" id="staffList"></div><br><button class="btn" id="closeStaffBtn">Back</button></div></div>
-  <div class="modal" id="winnersModal"><div class="modal-card"><h2>🏆 Winners</h2><div class="grid-list" id="winnersList"></div><br><button class="btn" id="closeWinnersBtn">Back</button></div></div>
+<div id="stage">
+    <div id="logo-hub">
+        <img src="Lime_Street_Elementary_School_logo_template_300.png" style="width:100%">
+    </div>
+</div>
 
-  <script>
-    const DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwz4lMDeYja7-Vluu-B8-StkdVcoMMQSS2-nYsrQxtOSm4SK-IwmJhSpvUlqK5TqrkHZKIVEz_RihC/pub?output=csv';
-    const MAX_PEOPLE = 110;
-    const stage=document.getElementById('stage'), adminBar=document.getElementById('adminBar'), staffList=document.getElementById('staffList'), winnersList=document.getElementById('winnersList');
-    const staffModal=document.getElementById('staffModal'), winnersModal=document.getElementById('winnersModal'), speechBox=document.getElementById('speechBox');
-    let people=[], winners=[];
-    const isAdmin=new URLSearchParams(location.search).get('admin')==='1';
-    if(isAdmin) adminBar.classList.add('show');
-    const shirts=['#2563eb','#16a34a','#dc2626','#9333ea','#f97316','#06b6d4','#ec4899','#facc15'];
-    const pants=['#111827','#374151','#1e3a8a','#14532d','#581c87'];
-    function rand(a,b){return Math.random()*(b-a)+a;} function pick(a){return a[Math.floor(Math.random()*a.length)];}
-    function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-    function fallbackFace(){return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="#e8b98e"/><rect x="20" y="30" width="18" height="18" fill="white"/><rect x="62" y="30" width="18" height="18" fill="white"/><rect x="28" y="37" width="7" height="7" fill="#111"/><rect x="69" y="37" width="7" height="7" fill="#111"/><rect x="34" y="66" width="32" height="7" fill="#111"/></svg>');}
-    function driveImage(url){const t=String(url||'').trim();const m=t.match(/[?&]id=([^&]+)/)||t.match(/\/d\/([^/]+)/);return m&&m[1]?'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w700':t;}
+<div id="raffle-panel">
+    <h2 style="margin-top:0; color:var(--tech-gold); border-bottom:1px solid #333; padding-bottom:10px">Winners</h2>
+    <div id="winner-list-box" style="max-height: 250px; overflow-y: auto;"></div>
+    <button onclick="toggleRaffle(false)" style="width:100%; margin-top:20px; background:none; border:1px solid #444; color:white; padding:12px; border-radius:6px; cursor:pointer">CLOSE</button>
+</div>
 
-    function createPerson(d){
-      const p={name:d.name||'Staff',quote:d.quote||'Happy Staff Appreciation Week!',would:d.would||'',src:d.src||fallbackFace(),winner:String(d.raffleWinner||'').trim().toLowerCase()==='yes',prize:d.prize||'',lane:Math.floor(rand(0,4)),speed:rand(.00008,.00030),progress:rand(.78,.98),laps:0,state:'entry',restUntil:0,shirt:pick(shirts),pants:pick(pants),spotlight:false};
-      const el=document.createElement('div'); el.className=p.winner?'player is-winner':'player'; el.style.setProperty('--shirt',p.shirt); el.style.setProperty('--pants',p.pants);
-      el.innerHTML='<div class="head"><img alt="'+esc(p.name)+'"></div><div class="name-tag">'+esc(p.name)+'</div><div class="winner-badge">WINNER</div>'; 
-      const img=el.querySelector('img'); img.src=p.src; img.onerror=()=>{img.src=fallbackFace();};
-      el.onclick=e=>{e.stopPropagation();spotlightPerson(p);}; stage.appendChild(el); p.el=el; people.push(p); renderStaffList(); return p;
+<div id="profile-card"></div>
+
+<script>
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwz4lMDeYja7-Vluu-B8-StkdVcoMMQSS2-nYsrQxtOSm4SK-IwmJhSpvUlqK5TqrkHZKIVEz_RihC/pub?output=csv";
+    let staffData = [];
+    let autoCloseTimer = null;
+
+    async function init() {
+        const response = await fetch(csvUrl);
+        const data = await response.text();
+        const rows = data.split('\n').slice(1);
+        
+        const dropdown = document.getElementById('staff-dropdown');
+        const winBox = document.getElementById('winner-list-box');
+
+        rows.forEach((row, i) => {
+            const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if(cols.length < 4) return;
+            
+            const staff = {
+                id: `staff-${i}`,
+                name: cols[1].replace(/"/g, '').trim(),
+                quote: cols[2].replace(/"/g, ''),
+                photo: cols[3].trim(),
+                years: parseInt(cols[4]) || 1,
+                isWinner: cols[5]?.toLowerCase().includes('yes'),
+                prize: cols[6] || "Gift"
+            };
+            staffData.push(staff);
+            createAvatar(staff, i);
+
+            if(staff.isWinner) {
+                winBox.innerHTML += `<div style="padding:10px; border-bottom:1px solid #222"><b style="color:var(--tech-gold)">${staff.name}</b><br><small>${staff.prize}</small></div>`;
+            }
+        });
+
+        staffData.sort((a,b) => a.name.localeCompare(b.name)).forEach(s => {
+            const link = document.createElement('div');
+            link.className = 'staff-link';
+            link.innerText = s.name;
+            link.onclick = () => { focusStaff(s.id); toggleDropdown(); };
+            dropdown.appendChild(link);
+        });
     }
-    function paradePoint(t,lane){const yellow=170,left=80+lane*16,right=innerWidth-yellow-95-lane*16,top=150+lane*15,bottom=innerHeight-105-lane*12;const w=Math.max(260,right-left),h=Math.max(180,bottom-top),per=2*(w+h);let d=(t%1)*per;if(d<w)return{x:left+d,y:top};d-=w;if(d<h)return{x:right,y:top+d};d-=h;if(d<w)return{x:right-d,y:bottom};d-=w;return{x:left,y:bottom-d};}
-    function entryPoint(p){return{x:innerWidth-132+(p.lane%2)*38,y:170+p.lane*90+Math.sin(Date.now()/600+p.lane)*14};}
-    function centerPoint(){return{x:(innerWidth-170)/2-24,y:innerHeight/2-70};}
-    function animate(){const now=Date.now();people.forEach(p=>{let pos,scale=.78,z=20+p.lane;if(p.spotlight){pos=centerPoint();scale=3.8;z=180;}else if(p.state==='rest'){pos=entryPoint(p);scale=.72;z=25;if(now>p.restUntil){p.state='entry';p.progress=.01;}}else{p.progress+=p.speed;if(p.progress>=1){p.progress-=1;p.laps++;}if(p.laps>=3&&p.progress>.72){p.state='rest';p.restUntil=now+rand(2500,7000);p.laps=0;pos=entryPoint(p);}else{pos=paradePoint(p.progress,p.lane);}const near=Math.abs(pos.x-((innerWidth-170)/2))<150&&Math.abs(pos.y-innerHeight/2)<130;if(near){scale=1.05;z=60;}}p.el.style.zIndex=z;p.el.style.transform='translate('+pos.x+'px,'+pos.y+'px) scale('+scale+')';});requestAnimationFrame(animate);}
-    function spotlightPerson(p){people.forEach(x=>{x.spotlight=false;x.el.classList.remove('spotlight');});p.spotlight=true;p.el.classList.add('spotlight');document.getElementById('speechName').textContent=p.name;document.getElementById('speechQuote').textContent='💬 “'+p.quote+'”';document.getElementById('speechWould').textContent=p.would?'🤔 Would you rather: '+p.would:'';speechBox.classList.add('show');launchConfetti(1);}
-    function closeSpotlight(){people.forEach(p=>{p.spotlight=false;p.el.classList.remove('spotlight');});speechBox.classList.remove('show');}
-    function parseCSV(text){const rows=[];let row=[],cell='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'&&q&&n==='"'){cell+='"';i++;}else if(c==='"')q=!q;else if(c===','&&!q){row.push(cell);cell='';}else if((c==='\n'||c==='\r')&&!q){if(cell||row.length){row.push(cell);rows.push(row);row=[];cell='';}if(c==='\r'&&n==='\n')i++;}else cell+=c;}if(cell||row.length){row.push(cell);rows.push(row);}return rows;}
-    async function loadSheet(url){try{const res=await fetch(url||document.getElementById('sheetUrl').value.trim()||DEFAULT_CSV);if(!res.ok)throw new Error('Could not load sheet');const rows=parseCSV(await res.text()).filter(r=>r.some(c=>String(c).trim()!==''));if(rows.length<2)return;const h=rows[0].map(x=>String(x).trim().toLowerCase());const ni=h.findIndex(x=>x.includes('name')),qi=h.findIndex(x=>x.includes('quote')),wi=h.findIndex(x=>x.includes('would')),ii=h.findIndex(x=>x.includes('photo')||x.includes('selfie')||x.includes('pic')||x.includes('image')),ri=h.findIndex(x=>x.includes('raffle winner')),pi=h.findIndex(x=>x.includes('prize'));clearAll(false);rows.slice(1,MAX_PEOPLE+1).forEach(row=>{const name=row[ni]||'Staff',raffle=ri>=0?row[ri]:'',prize=pi>=0?row[pi]:'';if(String(raffle).trim().toLowerCase()==='yes')winners.push({name,prize:prize||'Prize Bag'});createPerson({name,quote:qi>=0?row[qi]:'',would:wi>=0?row[wi]:'',src:ii>=0?driveImage(row[ii]):fallbackFace(),raffleWinner:raffle,prize});});renderWinners();renderStaffList();}catch(e){console.error(e);if(isAdmin)alert(e.message);}}
-    function clearAll(resetWinners=true){people.forEach(p=>p.el.remove());people=[];if(resetWinners)winners=[];renderWinners();renderStaffList();}
-    function renderStaffList(){staffList.innerHTML=people.length?people.map((p,i)=>'<button class="list-item" data-i="'+i+'">'+esc(p.name)+'</button>').join(''):'<div class="list-item">No staff loaded yet</div>';}
-    function renderWinners(){winnersList.innerHTML=winners.length?winners.map(w=>'<div class="list-item winner-item">🎉 '+esc(w.name)+'<br><span>'+esc(w.prize)+'</span></div>').join(''):'<div class="list-item winner-item">No winners yet</div>';}
-    function launchConfetti(b){const colors=['#f43f5e','#0ea5e9','#22c55e','#fde047','#a855f7','#f97316'];let count=0;const timer=setInterval(()=>{for(let i=0;i<65;i++){const pc=document.createElement('div');pc.className='confetti';pc.style.left=rand(0,100)+'vw';pc.style.background=pick(colors);pc.style.animationDelay=rand(0,.5)+'s';document.body.appendChild(pc);setTimeout(()=>pc.remove(),4800);}if(++count>=(b||1))clearInterval(timer);},450);}
-    document.getElementById('loadBtn').onclick=()=>loadSheet();document.getElementById('clearBtn').onclick=()=>clearAll();document.getElementById('addWinnerBtn').onclick=()=>{const name=prompt('Winner name','Cafeteria Lady');if(!name)return;const prize=prompt('Prize','Small Red Bag')||'Prize';winners.push({name,prize});renderWinners();winnersModal.style.display='flex';launchConfetti(3);};document.getElementById('photoInput').onchange=e=>Array.from(e.target.files).forEach(file=>{const r=new FileReader();r.onload=ev=>createPerson({src:ev.target.result,name:prompt('Name?','Staff')||'Staff',quote:prompt('Quote?','')||'',would:prompt('Would You Rather?','')||''});r.readAsDataURL(file);});document.getElementById('refreshBtn').onclick=()=>{launchConfetti(4);setTimeout(()=>location.reload(),1600);};document.getElementById('winnersBtn').onclick=()=>{renderWinners();winnersModal.style.display='flex';launchConfetti(2);};document.getElementById('staffBtn').onclick=()=>{renderStaffList();staffModal.style.display='flex';};document.getElementById('closeStaffBtn').onclick=()=>staffModal.style.display='none';document.getElementById('closeWinnersBtn').onclick=()=>winnersModal.style.display='none';document.getElementById('closeSpeechBtn').onclick=closeSpotlight;staffList.onclick=e=>{const b=e.target.closest('button[data-i]');if(b){staffModal.style.display='none';spotlightPerson(people[Number(b.dataset.i)]);}};
-    renderWinners();renderStaffList();loadSheet(DEFAULT_CSV);setTimeout(()=>launchConfetti(3),700);animate();
-  </script>
+
+    function createAvatar(staff, index) {
+        const char = document.createElement('div');
+        char.className = 'character';
+        char.id = staff.id;
+        const radius = window.innerWidth < 600 ? 120 + (Math.random() * 100) : 220 + (Math.random() * 300);
+        const duration = 40 + (Math.random() * 40);
+        
+        const style = document.createElement("style");
+        style.innerText = `@keyframes orbit${index} { 
+            from { transform: rotate(0deg) translateX(${radius}px) rotate(0deg); } 
+            to { transform: rotate(360deg) translateX(${radius}px) rotate(-360deg); } 
+        }`;
+        document.head.appendChild(style);
+        char.style.animation = `orbit${index} ${duration}s linear infinite`;
+
+        let id = staff.photo.includes('id=') ? staff.photo.split('id=')[1].split('&')[0] : 
+                 staff.photo.includes('/d/') ? staff.photo.split('/d/')[1].split('/')[0] : "";
+        const img = id ? `https://lh3.googleusercontent.com/u/0/d/${id}` : staff.photo;
+
+        // ADD RADIATING SERVICE RINGS
+        let ringsHtml = '';
+        const ringCount = Math.min(staff.years, 5);
+        for(let r=1; r<=ringCount; r++) {
+            const size = 50 + (r * 15);
+            ringsHtml += `<div class="service-ring" style="width:${size}px; height:${size}px; top:calc(50% - ${size/2}px); left:calc(50% - ${size/2}px); animation-delay:${r*0.3}s"></div>`;
+        }
+
+        char.innerHTML = `${ringsHtml}<div class="face ${staff.isWinner ? 'winner-glow' : ''}" style="background-image: url('${img}')"></div>`;
+        char.onclick = (e) => showHero(staff, char, e);
+        document.getElementById('stage').appendChild(char);
+    }
+
+    function toggleDropdown() {
+        const d = document.getElementById('staff-dropdown');
+        const arrow = document.getElementById('drop-arrow');
+        d.classList.toggle('open');
+        arrow.innerText = d.classList.contains('open') ? '▲' : '▼';
+    }
+
+    function focusStaff(id) {
+        const char = document.getElementById(id);
+        if(char) char.click();
+    }
+
+    function showHero(staff, element, e) {
+        if(e) e.stopPropagation();
+        
+        clearTimeout(autoCloseTimer); // Reset timer if someone else is clicked
+        
+        document.querySelectorAll('.character').forEach(c => c.classList.remove('hero'));
+        element.classList.add('hero');
+
+        const card = document.getElementById('profile-card');
+        card.innerHTML = `
+            <h3 style="margin:0; color:var(--tech-gold)">${staff.name}</h3>
+            <p style="font-size:10px; color:#555; margin-bottom:10px">${staff.years} Years of Service</p>
+            <p style="font-style:italic; font-size:13px">"${staff.quote}"</p>
+            <div style="font-size: 8px; color: #444; margin-top: 10px; text-transform: uppercase;">Closing in 10s...</div>
+        `;
+        card.style.display = 'block';
+
+        // START 10 SECOND AUTO-CLOSE
+        autoCloseTimer = setTimeout(() => {
+            closeHero();
+        }, 10000);
+    }
+
+    function toggleRaffle(show) { document.getElementById('raffle-panel').style.display = show ? 'block' : 'none'; }
+    
+    function closeHero() { 
+        document.querySelectorAll('.character').forEach(c => c.classList.remove('hero')); 
+        document.getElementById('profile-card').style.display = 'none'; 
+    }
+    
+    document.addEventListener('click', (e) => {
+        if(!e.target.closest('.character') && !e.target.closest('#profile-card') && !e.target.closest('#command-menu')) {
+            closeHero();
+        }
+    });
+
+    init();
+</script>
 </body>
 </html>

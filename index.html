@@ -3,186 +3,503 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Staff Appreciation Parade</title>
+  <title>Lime Street Selfie Parade</title>
   <style>
     * { box-sizing: border-box; }
+    :root {
+      --black: #111111;
+      --red: #9f111b;
+      --darkred: #61080e;
+      --yellow: #ffeb00;
+      --cream: #fff8d6;
+    }
     body {
       margin: 0;
       overflow: hidden;
-      font-family: Arial, Helvetica, sans-serif;
-      background: radial-gradient(circle at top, #fff7cc, #ffd6ec 35%, #bde7ff 70%, #d7ffd9);
-      color: #111827;
+      font-family: Impact, Arial Black, Arial, sans-serif;
+      background: #111;
+      color: white;
     }
-    #stage { position: fixed; inset: 0; overflow: hidden; }
+    #app {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, transparent 0 calc(100% - 190px), var(--yellow) calc(100% - 190px) 100%),
+        repeating-conic-gradient(from 0deg, #111 0 25%, #8b1118 0 50%) 0 0 / 78px 78px;
+    }
+    #app::after {
+      content: '';
+      position: absolute;
+      inset: 0 190px 0 0;
+      background: radial-gradient(circle at center, rgba(255,255,255,.08), transparent 35%);
+      pointer-events: none;
+    }
+    .yellow-lane {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 190px;
+      height: 100%;
+      background: var(--yellow);
+      border-left: 6px solid #111;
+      z-index: 2;
+      box-shadow: inset 12px 0 rgba(0,0,0,.15);
+    }
+    .lane-title {
+      position: absolute;
+      top: 155px;
+      right: 18px;
+      width: 150px;
+      color: #111;
+      text-align: center;
+      font-size: 22px;
+      line-height: .95;
+      transform: rotate(90deg);
+      opacity: .7;
+    }
+    .center-logo {
+      position: absolute;
+      left: calc((100vw - 190px) / 2);
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(38vw, 360px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      z-index: 4;
+      background: radial-gradient(circle, #111 0 46%, #8b1118 47% 70%, white 71% 78%, transparent 79%);
+      border: 8px solid rgba(255,255,255,.8);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 18px 50px rgba(0,0,0,.45), inset 0 0 35px rgba(255,255,255,.1);
+      pointer-events: none;
+    }
+    .center-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+    .logo-fallback {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: white;
+      font-size: clamp(24px, 4vw, 46px);
+      line-height: .92;
+      padding: 38px;
+      text-shadow: 3px 3px #000;
+    }
+    .logo-fallback span { font-size: 68px; display: block; }
+
+    .topbar {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: min(96vw, 1000px);
+      pointer-events: none;
+    }
+    .top-btn {
+      pointer-events: auto;
+      border: 5px solid #111;
+      background: #fff;
+      color: #111;
+      border-radius: 6px;
+      padding: 9px 14px;
+      font-weight: 1000;
+      font-size: 15px;
+      box-shadow: 6px 6px 0 rgba(0,0,0,.35);
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    .top-btn.refresh { background: #ffe85b; }
+    .top-btn span { display: block; font-size: 9px; opacity: .7; }
 
     .admin-bar {
-      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-      z-index: 90; display: none; gap: 8px; flex-wrap: wrap; justify-content: center;
-      width: min(96vw, 1100px); padding: 10px; background: rgba(255,255,255,.95);
-      border-radius: 24px; box-shadow: 0 10px 28px rgba(0,0,0,.18);
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 120;
+      display: none;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: min(96vw, 1100px);
+      background: rgba(255,255,255,.92);
+      padding: 10px;
+      border: 5px solid #111;
+      box-shadow: 6px 6px 0 rgba(0,0,0,.35);
     }
     .admin-bar.show { display: flex; }
-    .sheet-input { width: min(430px, 86vw); padding: 10px 13px; border: 2px solid #cbd5e1; border-radius: 999px; font-weight: 700; }
-    .btn, label.upload-btn, .top-btn {
-      border: 4px solid #111827; padding: 9px 14px; border-radius: 999px; background: white; color: #111827;
-      font-weight: 1000; cursor: pointer; box-shadow: 0 6px 0 rgba(17,24,39,.25); font-size: 14px;
+    .admin-bar input { min-width: 360px; padding: 10px; border: 3px solid #111; font-weight: 900; }
+    .btn, label.upload-btn {
+      border: 3px solid #111;
+      background: #9f111b;
+      color: white;
+      padding: 9px 12px;
+      font-weight: 1000;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #111;
     }
-    .btn { border: 0; background: #0ea5e9; color: white; box-shadow: 0 5px 0 #0369a1; }
-    .btn.green { background:#22c55e; box-shadow:0 5px 0 #15803d; }
-    .btn.purple { background:#8b5cf6; box-shadow:0 5px 0 #5b21b6; }
-    .btn.pink { background:#ec4899; box-shadow:0 5px 0 #9d174d; }
-    .btn.dark { background:#334155; box-shadow:0 5px 0 #0f172a; }
-    input[type="file"] { display:none; }
+    input[type=file] { display: none; }
 
-    #refreshBtn { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 50; background: linear-gradient(135deg,#fff,#fef3c7,#fde68a); }
-    #refreshBtn span { display:block; font-size:9px; opacity:.7; text-transform:uppercase; letter-spacing:.04em; }
-    #winnersBtn { position: fixed; top: 72px; left: calc(50% - 92px); transform: translateX(-50%); z-index: 50; }
-    #staffBtn { position: fixed; top: 72px; left: calc(50% + 92px); transform: translateX(-50%); z-index: 50; }
+    .stage { position: absolute; inset: 0; z-index: 10; }
 
-    .doorway {
-      position: fixed; right: 7vw; top: 40%; width: 130px; height: 190px; z-index: 5;
-      border: 8px solid #111827; border-bottom: 0; border-radius: 70px 70px 8px 8px;
-      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(254,243,199,.75));
-      box-shadow: inset 0 0 0 8px rgba(255,255,255,.55), 0 12px 30px rgba(0,0,0,.22);
-      display:flex; align-items:flex-start; justify-content:center; padding-top:18px; font-weight:1000; text-align:center; pointer-events:none;
+    .pixel-person {
+      position: absolute;
+      width: 62px;
+      height: 92px;
+      cursor: pointer;
+      transform-origin: center bottom;
+      image-rendering: pixelated;
+      z-index: 20;
+      transition: filter .15s ease;
+    }
+    .pixel-person.spotlight {
+      z-index: 180 !important;
+      filter: drop-shadow(0 0 18px #fff) drop-shadow(0 0 28px #ffe600);
+    }
+    .selfie-head {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 44px;
+      height: 44px;
+      border: 4px solid #111;
+      background: #f8d7b0;
+      border-radius: 50%;
+      overflow: hidden;
+      z-index: 5;
+      box-shadow: 3px 3px 0 rgba(0,0,0,.35);
+    }
+    .selfie-head img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .hair {
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 52px;
+      height: 25px;
+      border-radius: 30px 30px 8px 8px;
+      background: var(--hair);
+      border: 3px solid #111;
+      z-index: 4;
+    }
+    .body {
+      position: absolute;
+      top: 39px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 54px;
+      height: 45px;
+      background: var(--shirt);
+      border: 4px solid #111;
+      border-radius: 16px 16px 10px 10px;
+      z-index: 2;
+    }
+    .pants {
+      position: absolute;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48px;
+      height: 18px;
+      background: var(--pants);
+      border: 4px solid #111;
+      border-radius: 0 0 10px 10px;
+      z-index: 1;
+    }
+    .feet {
+      position: absolute;
+      top: 88px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 54px;
+      height: 8px;
+      background: #111;
+      border-radius: 999px;
+      animation: feetWalk .3s infinite alternate;
+    }
+    @keyframes feetWalk { from { width: 46px; } to { width: 60px; } }
+    .name-mini {
+      position: absolute;
+      top: 94px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      color: #111;
+      border: 3px solid #111;
+      font-size: 9px;
+      font-weight: 1000;
+      max-width: 78px;
+      padding: 2px 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-shadow: 2px 2px 0 rgba(0,0,0,.3);
+    }
+    .winner-chain {
+      position: absolute;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      width: 62px;
+      z-index: 8;
+      pointer-events: none;
+    }
+    .is-winner .winner-chain { display: block; }
+    .chain-medal {
+      margin: 0 auto;
+      width: 58px;
+      height: 26px;
+      background: linear-gradient(135deg,#fff7ad,#f59e0b,#b45309);
+      color: #111;
+      border: 3px solid #111;
+      border-radius: 6px;
+      font-size: 7px;
+      font-weight: 1000;
+      line-height: .9;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      box-shadow: 3px 3px 0 rgba(0,0,0,.35);
     }
 
-    .footer-note { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 20; background: rgba(255,255,255,.84); border-radius:999px; padding:8px 14px; font-weight:900; font-size:13px; }
+    .speech {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      width: min(92vw, 720px);
+      background: #fff;
+      color: #111;
+      border: 6px solid #111;
+      box-shadow: 8px 8px 0 rgba(0,0,0,.45);
+      z-index: 190;
+      padding: 18px;
+      display: none;
+      text-align: center;
+    }
+    .speech.show { display: block; }
+    .speech h2 { margin: 0 0 8px; font-size: 34px; color: #9f111b; }
+    .speech p { margin: 6px 0; font-size: 22px; font-family: Arial, sans-serif; font-weight: 900; }
+    .speech .close { margin-top: 10px; }
 
-    .character { position:absolute; width:88px; height:150px; transform-origin:center bottom; will-change:transform; cursor:pointer; user-select:none; }
-    .character.spotlight { filter: drop-shadow(0 0 20px #fde047) drop-shadow(0 0 28px #0ea5e9); z-index: 96 !important; }
-    .head { position:absolute; top:0; left:50%; transform:translateX(-50%); width:54px; height:54px; border-radius:50%; overflow:hidden; border:4px solid #fff; background:white; box-shadow:0 5px 12px rgba(0,0,0,.25); z-index:4; }
-    .head img { width:100%; height:100%; object-fit:cover; }
-    .name-tag { position:absolute; top:62px; left:50%; transform:translateX(-50%); width:70px; height:52px; border-radius:16px; background:linear-gradient(135deg,#fff,#e0f2fe); border:3px solid #111827; display:flex; align-items:center; justify-content:center; text-align:center; font-size:10px; font-weight:1000; padding:4px; overflow:hidden; z-index:3; }
-    .arm,.leg { position:absolute; background:#111827; border-radius:999px; transform-origin:top center; animation:swing .55s infinite alternate ease-in-out; z-index:1; }
-    .arm { width:6px; height:34px; top:70px; }
-    .arm.left { left:16px; } .arm.right { right:16px; animation-delay:-.55s; }
-    .leg { width:7px; height:34px; top:112px; }
-    .leg.left { left:30px; animation-delay:-.55s; } .leg.right { right:30px; }
-    @keyframes swing { from { rotate:-10deg; } to { rotate:10deg; } }
-
-    .winner-chain { position:absolute; top:108px; left:50%; transform:translateX(-50%); z-index:9; width:82px; display:none; pointer-events:none; filter:drop-shadow(0 5px 7px rgba(0,0,0,.35)); }
-    .is-winner .winner-chain { display:block; }
-    .chain-loop { width:56px; height:22px; margin:0 auto -6px; border:6px dashed #fbbf24; border-bottom:0; border-radius:60px 60px 0 0; }
-    .chain-medal { width:78px; height:38px; margin:0 auto; border-radius:14px; background:linear-gradient(135deg,#fff7ad,#f59e0b 45%,#fef3c7 75%,#b45309); border:3px solid #78350f; display:flex; align-items:center; justify-content:center; text-align:center; font-size:8px; line-height:.95; font-weight:1000; }
-
-    .quote-bubble { position:absolute; left:68px; top:-18px; width:230px; min-height:74px; padding:12px 14px; border-radius:22px; background:white; border:4px solid #111827; box-shadow:0 12px 24px rgba(0,0,0,.24); font-size:15px; line-height:1.22; font-weight:800; display:none; z-index:100; }
-    .character.show-quote .quote-bubble { display:block; }
-    .quote-name { display:block; color:#ec4899; font-size:13px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:5px; }
-    .bubble-label { display:inline-block; margin-bottom:6px; padding:3px 8px; border-radius:999px; background:#fef3c7; border:2px solid #111827; font-size:12px; font-weight:1000; }
-    .bubble-text { display:block; }
-
-    .modal { position:fixed; inset:0; z-index:120; display:none; align-items:center; justify-content:center; background:rgba(15,23,42,.55); text-align:center; padding:20px; }
-    .modal-card { width:min(92vw,760px); max-height:88vh; overflow-y:auto; padding:30px; border-radius:34px; background:white; box-shadow:0 25px 70px rgba(0,0,0,.35); border:8px solid #fde047; }
-    .modal-card h2 { margin:0 0 12px; font-size:clamp(30px,7vw,70px); color:#ec4899; }
-    .winners-list-big,.staff-list-big { display:grid; gap:12px; margin-top:16px; }
-    .staff-list-big { grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); }
-    .winner-row,.staff-row { padding:14px; border:4px solid #111827; border-radius:22px; background:#fef3c7; box-shadow:0 6px 0 #fbbf24; font-size:clamp(18px,3vw,32px); font-weight:1000; }
-    .staff-row { background:#e0f2fe; box-shadow:0 5px 0 #38bdf8; font-size:18px; cursor:pointer; }
-    .winner-row span { color:#ec4899; }
-    .confetti { position:fixed; top:-20px; width:12px; height:18px; opacity:.9; z-index:130; animation:fall 4s linear forwards; }
-    @keyframes fall { to { transform:translateY(110vh) rotate(720deg); } }
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 210;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.65);
+      padding: 20px;
+    }
+    .modal-card {
+      width: min(92vw, 760px);
+      max-height: 88vh;
+      overflow-y: auto;
+      background: #fff;
+      color: #111;
+      border: 8px solid #111;
+      box-shadow: 10px 10px 0 rgba(0,0,0,.55);
+      padding: 25px;
+      text-align: center;
+    }
+    .modal-card h2 { margin: 0 0 14px; font-size: clamp(34px, 7vw, 70px); color: #9f111b; }
+    .grid-list { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+    .list-item {
+      background: #ffe85b;
+      border: 5px solid #111;
+      padding: 12px;
+      font-size: 18px;
+      font-weight: 1000;
+      box-shadow: 5px 5px 0 rgba(0,0,0,.35);
+      cursor: pointer;
+    }
+    .winner-item { background: #fff2a8; font-size: 24px; }
+    .confetti { position: fixed; top: -20px; width: 12px; height: 18px; z-index: 300; animation: fall 4.3s linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
   </style>
 </head>
 <body>
-  <div id="stage"></div>
+  <div id="app">
+    <div class="yellow-lane"><div class="lane-title">ENTRY<br>LANE</div></div>
+    <div class="center-logo" id="centerLogo">
+      <img src="logo.png" onerror="this.style.display='none'" alt="Lime Street Logo">
+      <div class="logo-fallback"><span>🐻</span>LIME STREET<br>ELEMENTARY</div>
+    </div>
+    <div class="stage" id="stage"></div>
+  </div>
+
+  <div class="topbar">
+    <button class="top-btn refresh" id="refreshBtn">🎉 Celebrating the Staff 🎉<span>refresh the page</span></button>
+    <button class="top-btn" id="winnersBtn">🏆 Winners</button>
+    <button class="top-btn" id="staffBtn">📋 Staff List</button>
+  </div>
+
   <div class="admin-bar" id="adminBar">
-    <input class="sheet-input" id="sheetUrl" placeholder="Paste published Google Sheet CSV link" />
-    <button class="btn purple" id="loadSheetBtn">Load Responses</button>
+    <input id="sheetUrl" placeholder="Paste published Google Sheet CSV link" />
+    <button class="btn purple" id="loadBtn">Load Responses</button>
     <label class="upload-btn" for="photoInput">Manual Upload</label>
     <input id="photoInput" type="file" accept="image/*" multiple />
     <button class="btn green" id="addWinnerBtn">Add Winner</button>
     <button class="btn dark" id="clearBtn">Clear</button>
   </div>
 
-  <button class="top-btn" id="refreshBtn">🎉 Celebrating the Staff 🎉<span>tap to refresh the page</span></button>
-  <button class="top-btn" id="winnersBtn">🏆 Raffle Winners</button>
-  <button class="top-btn" id="staffBtn">📋 Staff List</button>
-  <div class="doorway">STAFF<br>SPOTLIGHT<br>DOOR</div>
-  <div class="footer-note">Tap a selfie to reveal their message 👀</div>
+  <div class="speech" id="speechBox">
+    <h2 id="speechName">Name</h2>
+    <p id="speechQuote">Quote</p>
+    <p id="speechWould">Would you rather</p>
+    <button class="btn pink close" id="closeSpeechBtn">Back to Parade</button>
+  </div>
 
-  <div class="modal" id="winnersModal"><div class="modal-card"><h2>🏆 Raffle Winners</h2><div id="winnersListBig" class="winners-list-big"></div><button class="btn pink" id="closeWinnersBtn">Back to Parade</button></div></div>
-  <div class="modal" id="staffModal"><div class="modal-card"><h2>📋 Staff List</h2><div id="staffListBig" class="staff-list-big"></div><button class="btn pink" id="closeStaffBtn">Back to Parade</button></div></div>
+  <div class="modal" id="staffModal"><div class="modal-card"><h2>📋 Staff List</h2><div class="grid-list" id="staffList"></div><br><button class="btn pink" id="closeStaffBtn">Back</button></div></div>
+  <div class="modal" id="winnersModal"><div class="modal-card"><h2>🏆 Winners</h2><div class="grid-list" id="winnersList"></div><br><button class="btn pink" id="closeWinnersBtn">Back</button></div></div>
 
   <script>
     const DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwz4lMDeYja7-Vluu-B8-StkdVcoMMQSS2-nYsrQxtOSm4SK-IwmJhSpvUlqK5TqrkHZKIVEz_RihC/pub?output=csv';
     const MAX_PEOPLE = 110;
     const stage = document.getElementById('stage');
     const adminBar = document.getElementById('adminBar');
-    const sheetUrlInput = document.getElementById('sheetUrl');
-    const loadSheetBtn = document.getElementById('loadSheetBtn');
-    const photoInput = document.getElementById('photoInput');
-    const addWinnerBtn = document.getElementById('addWinnerBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const refreshBtn = document.getElementById('refreshBtn');
-    const winnersBtn = document.getElementById('winnersBtn');
-    const staffBtn = document.getElementById('staffBtn');
-    const winnersModal = document.getElementById('winnersModal');
+    const staffList = document.getElementById('staffList');
+    const winnersList = document.getElementById('winnersList');
     const staffModal = document.getElementById('staffModal');
-    const closeWinnersBtn = document.getElementById('closeWinnersBtn');
-    const closeStaffBtn = document.getElementById('closeStaffBtn');
-    const winnersListBig = document.getElementById('winnersListBig');
-    const staffListBig = document.getElementById('staffListBig');
+    const winnersModal = document.getElementById('winnersModal');
+    const speechBox = document.getElementById('speechBox');
+    const speechName = document.getElementById('speechName');
+    const speechQuote = document.getElementById('speechQuote');
+    const speechWould = document.getElementById('speechWould');
+
     let people = [];
     let winners = [];
     const isAdmin = new URLSearchParams(location.search).get('admin') === '1';
-    if (isAdmin) adminBar.classList.add('show');
+    if (isAdmin) adminBar.style.display = 'flex';
 
-    function rand(a,b){return Math.random()*(b-a)+a;}
-    function esc(v){return String(v||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-    function fallbackFace(){return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="white"/><circle cx="100" cy="100" r="78" fill="#fde68a"/><circle cx="75" cy="85" r="10" fill="#111827"/><circle cx="125" cy="85" r="10" fill="#111827"/><path d="M65 120 Q100 150 135 120" stroke="#111827" stroke-width="9" fill="none" stroke-linecap="round"/></svg>');}
-    function driveImage(url){const t=String(url||'').trim();const m=t.match(/[?&]id=([^&]+)/)||t.match(/\/d\/([^/]+)/);return m&&m[1]?'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w700':t;}
+    const palettes = {
+      shirts: ['#2563eb','#16a34a','#dc2626','#9333ea','#f97316','#06b6d4','#ec4899','#facc15'],
+      pants: ['#111827','#374151','#1e3a8a','#14532d','#581c87'],
+      hair: ['#111111','#5c3317','#facc15','#ef4444','#1d4ed8','#6b7280']
+    };
+    function rand(a,b){ return Math.random()*(b-a)+a; }
+    function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+    function esc(v){ return String(v||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function fallbackFace(){ return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="#f8d7b0"/><circle cx="100" cy="100" r="78" fill="#f8d7b0"/><circle cx="75" cy="86" r="18" fill="white"/><circle cx="125" cy="86" r="18" fill="white"/><circle cx="75" cy="86" r="7" fill="#111"/><circle cx="125" cy="86" r="7" fill="#111"/><path d="M68 125 Q100 150 132 125" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/></svg>'); }
+    function driveImage(url){ const t=String(url||'').trim(); const m=t.match(/[?&]id=([^&]+)/)||t.match(/\/d\/([^/]+)/); return m&&m[1] ? 'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w700' : t; }
 
-    function makeCharacter(d){
-      const name=d.name||'Staff', quote=d.quote||'Happy Staff Appreciation Week!', would=d.would||'', isWinner=String(d.raffleWinner||'').trim().toLowerCase()==='yes';
-      const el=document.createElement('div');
-      el.className=isWinner?'character is-winner':'character';
-      el.dataset.mode='quote';
-      el.innerHTML='<div class="quote-bubble"><span class="quote-name">'+esc(name)+'</span><span class="bubble-label">💬 Quote</span><span class="bubble-text">“'+esc(quote)+'”</span></div><div class="head"><img alt="'+esc(name)+'"></div><div class="name-tag">'+esc(name)+'</div><div class="winner-chain"><div class="chain-loop"></div><div class="chain-medal">RAFFLE<br>WINNER</div></div><div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div>';
-      const img=el.querySelector('img'); img.src=d.src||fallbackFace(); img.onerror=function(){img.src=fallbackFace();};
-      el.addEventListener('click',function(e){e.stopPropagation();showPerson(people.findIndex(p=>p.el===el));});
-      stage.appendChild(el);
-      people.push({el,name,quote,would,progress:Math.random(),speed:rand(.00008,.00022),lane:Math.floor(rand(0,4)),scale:rand(.82,1.05),spotlightUntil:0});
-      renderStaffList();
+    function createPerson(data){
+      const p = {
+        name: data.name || 'Staff', quote: data.quote || 'Happy Staff Appreciation Week!', would: data.would || '',
+        src: data.src || fallbackFace(), winner: String(data.raffleWinner||'').trim().toLowerCase()==='yes', prize: data.prize || '',
+        lane: Math.floor(rand(0,4)), speed: rand(.00008,.00032), progress: rand(.78, .98), laps: 0, state: 'entry', restUntil: 0,
+        shirt: pick(palettes.shirts), pants: pick(palettes.pants), hair: pick(palettes.hair), spotlight: false
+      };
+      const el = document.createElement('div');
+      el.className = p.winner ? 'pixel-person is-winner' : 'pixel-person';
+      el.style.setProperty('--shirt', p.shirt);
+      el.style.setProperty('--pants', p.pants);
+      el.style.setProperty('--hair', p.hair);
+      el.innerHTML = '<div class="hair"></div><div class="selfie-head"><img alt="'+esc(p.name)+'"></div><div class="body"></div><div class="pants"></div><div class="feet"></div><div class="name-mini">'+esc(p.name)+'</div><div class="winner-chain"><div class="chain-medal">RAFFLE<br>WINNER</div></div>';
+      const img = el.querySelector('img'); img.src = p.src; img.onerror = () => { img.src = fallbackFace(); };
+      el.addEventListener('click', e => { e.stopPropagation(); spotlightPerson(p); });
+      stage.appendChild(el); p.el = el; people.push(p); renderStaffList(); return p;
     }
 
-    function clearAll(){people.forEach(p=>p.el.remove());people=[];winners=[];renderWinners();renderStaffList();}
-    function parseCSV(text){const rows=[];let row=[],cell='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'&&q&&n==='"'){cell+='"';i++;}else if(c==='"')q=!q;else if(c===','&&!q){row.push(cell);cell='';}else if((c==='\n'||c==='\r')&&!q){if(cell||row.length){row.push(cell);rows.push(row);row=[];cell='';}if(c==='\r'&&n==='\n')i++;}else cell+=c;}if(cell||row.length){row.push(cell);rows.push(row);}return rows;}
+    function paradePoint(t, lane){
+      const yellow = 190; const margin = 88 + lane*26; const top = 138 + lane*18;
+      const left = margin; const right = innerWidth - yellow - margin; const bottom = innerHeight - 125 - lane*16;
+      const w = Math.max(280, right-left), h = Math.max(180, bottom-top), per = 2*(w+h);
+      let d = (t%1)*per;
+      if(d < w) return {x:left+d,y:top}; d-=w;
+      if(d < h) return {x:right,y:top+d}; d-=h;
+      if(d < w) return {x:right-d,y:bottom}; d-=w;
+      return {x:left,y:bottom-d};
+    }
+    function centerPoint(){ return { x:(innerWidth-190)/2 - 31, y:innerHeight/2 - 70 }; }
+    function entryPoint(p){ return { x: innerWidth - 145 + (p.lane%2)*45, y: 170 + p.lane*95 + Math.sin(Date.now()/600+p.lane)*12 }; }
 
-    async function loadSheetCSV(url){
+    function animate(){
+      const now = Date.now();
+      people.forEach(p => {
+        let pos, scale = .78, z = 20 + p.lane;
+        if(p.spotlight){ pos = centerPoint(); scale = 2.45; z = 185; }
+        else if(p.state === 'rest'){
+          pos = entryPoint(p); scale = .72; z = 30;
+          if(now > p.restUntil){ p.state = 'entry'; p.progress = .01; }
+        } else {
+          const before = p.progress; p.progress += p.speed;
+          if(p.progress >= 1){ p.progress -= 1; p.laps++; }
+          if(p.laps >= 3 && p.progress > .72){ p.state = 'rest'; p.restUntil = now + rand(2500,7000); p.laps = 0; pos = entryPoint(p); }
+          else pos = paradePoint(p.progress, p.lane);
+          const nearLogo = Math.abs(pos.x - ((innerWidth-190)/2)) < 170 && Math.abs(pos.y - innerHeight/2) < 150;
+          if(nearLogo){ scale = 1.05; z = 60; }
+        }
+        p.el.style.zIndex = z;
+        p.el.style.transform = 'translate('+pos.x+'px,'+pos.y+'px) scale('+scale+')';
+      });
+      requestAnimationFrame(animate);
+    }
+
+    function spotlightPerson(p){
+      people.forEach(x => { x.spotlight=false; x.el.classList.remove('spotlight'); });
+      p.spotlight = true; p.el.classList.add('spotlight');
+      speechName.textContent = p.name;
+      speechQuote.textContent = '💬 “' + p.quote + '”';
+      speechWould.textContent = p.would ? '🤔 Would you rather: ' + p.would : '';
+      speechBox.classList.add('show');
+      launchConfetti(1);
+    }
+    function closeSpotlight(){ people.forEach(p => { p.spotlight=false; p.el.classList.remove('spotlight'); }); speechBox.classList.remove('show'); }
+
+    function parseCSV(text){ const rows=[]; let row=[], cell='', q=false; for(let i=0;i<text.length;i++){ const c=text[i], n=text[i+1]; if(c==='"'&&q&&n==='"'){cell+='"';i++;} else if(c==='"') q=!q; else if(c===','&&!q){row.push(cell);cell='';} else if((c==='\n'||c==='\r')&&!q){ if(cell||row.length){row.push(cell);rows.push(row);row=[];cell='';} if(c==='\r'&&n==='\n')i++; } else cell+=c; } if(cell||row.length){row.push(cell);rows.push(row);} return rows; }
+    async function loadSheet(url){
       try{
-        const res=await fetch(url||sheetUrlInput.value.trim()||DEFAULT_CSV); if(!res.ok)throw new Error('Could not load sheet');
-        const rows=parseCSV(await res.text()).filter(r=>r.some(c=>String(c).trim()!=='')); if(rows.length<2)return;
-        const h=rows[0].map(x=>String(x).trim().toLowerCase());
-        const ni=h.findIndex(x=>x.includes('name')), qi=h.findIndex(x=>x.includes('quote')), wi=h.findIndex(x=>x.includes('would')), ii=h.findIndex(x=>x.includes('photo')||x.includes('selfie')||x.includes('pic')||x.includes('image')), ri=h.findIndex(x=>x.includes('raffle winner')), pi=h.findIndex(x=>x.includes('prize'));
-        if(ni<0)throw new Error('Missing Name column');
-        people.forEach(p=>p.el.remove()); people=[]; winners=[];
-        rows.slice(1,MAX_PEOPLE+1).forEach(row=>{const name=row[ni]||'Staff', raffle=ri>=0?row[ri]:'', prize=pi>=0?row[pi]:''; if(String(raffle).trim().toLowerCase()==='yes')winners.push({name,prize:prize||'Prize Bag'}); makeCharacter({name,quote:qi>=0?row[qi]:'',would:wi>=0?row[wi]:'',src:ii>=0?driveImage(row[ii]):fallbackFace(),raffleWinner:raffle});});
+        const res = await fetch(url || document.getElementById('sheetUrl').value.trim() || DEFAULT_CSV); if(!res.ok) throw new Error('Could not load sheet');
+        const rows = parseCSV(await res.text()).filter(r => r.some(c => String(c).trim() !== '')); if(rows.length < 2) return;
+        const h = rows[0].map(x => String(x).trim().toLowerCase());
+        const ni = h.findIndex(x=>x.includes('name')), qi=h.findIndex(x=>x.includes('quote')), wi=h.findIndex(x=>x.includes('would')), ii=h.findIndex(x=>x.includes('photo')||x.includes('selfie')||x.includes('pic')||x.includes('image')), ri=h.findIndex(x=>x.includes('raffle winner')), pi=h.findIndex(x=>x.includes('prize'));
+        clearAll(false);
+        rows.slice(1,MAX_PEOPLE+1).forEach(row => {
+          const name = row[ni] || 'Staff', raffle = ri>=0 ? row[ri] : '', prize = pi>=0 ? row[pi] : '';
+          if(String(raffle).trim().toLowerCase()==='yes') winners.push({name, prize: prize || 'Prize Bag'});
+          createPerson({ name, quote: qi>=0?row[qi]:'', would: wi>=0?row[wi]:'', src: ii>=0?driveImage(row[ii]):fallbackFace(), raffleWinner: raffle, prize });
+        });
         renderWinners(); renderStaffList();
-      }catch(err){console.error(err); if(isAdmin)alert(err.message);}
+      } catch(err){ console.error(err); if(isAdmin) alert(err.message); }
     }
+    function clearAll(resetWinners=true){ people.forEach(p=>p.el.remove()); people=[]; if(resetWinners) winners=[]; renderWinners(); renderStaffList(); }
+    function renderStaffList(){ staffList.innerHTML = people.length ? people.map((p,i)=>'<button class="list-item" data-i="'+i+'">'+esc(p.name)+'</button>').join('') : '<div class="list-item">No staff loaded yet</div>'; }
+    function renderWinners(){ winnersList.innerHTML = winners.length ? winners.map(w=>'<div class="list-item winner-item">🎉 '+esc(w.name)+'<br><span>'+esc(w.prize)+'</span></div>').join('') : '<div class="list-item winner-item">No winners yet</div>'; }
+    function launchConfetti(bursts){ const colors=['#f43f5e','#0ea5e9','#22c55e','#fde047','#a855f7','#f97316']; let count=0; const timer=setInterval(()=>{ for(let i=0;i<70;i++){ const pc=document.createElement('div'); pc.className='confetti'; pc.style.left=rand(0,100)+'vw'; pc.style.background=pick(colors); pc.style.animationDelay=rand(0,.5)+'s'; document.body.appendChild(pc); setTimeout(()=>pc.remove(),4800); } if(++count >= (bursts||1)) clearInterval(timer); },450); }
 
-    function renderWinners(){winnersListBig.innerHTML=winners.length?winners.map(w=>'<div class="winner-row">🎉 <strong>'+esc(w.name)+'</strong><br><span>'+esc(w.prize)+'</span></div>').join(''):'<div class="winner-row">No winners yet</div>';}
-    function renderStaffList(){staffListBig.innerHTML=people.length?people.map((p,i)=>'<button class="staff-row" data-index="'+i+'">'+esc(p.name)+'</button>').join(''):'<div class="winner-row">No staff loaded yet</div>';}
-    function showPerson(i){const p=people[i]; if(!p)return; staffModal.style.display='none'; people.forEach(x=>{x.el.classList.remove('spotlight','show-quote');}); p.spotlightUntil=Date.now()+9000; p.progress=.47; p.el.classList.add('spotlight','show-quote'); const lab=p.el.querySelector('.bubble-label'), txt=p.el.querySelector('.bubble-text'); lab.textContent='💬 Quote'; txt.textContent='“'+p.quote+'”'; launchConfetti(1);}
+    document.getElementById('loadBtn').onclick = () => loadSheet();
+    document.getElementById('clearBtn').onclick = () => clearAll();
+    document.getElementById('addWinnerBtn').onclick = () => { const name=prompt('Winner name','Cafeteria Lady'); if(!name)return; const prize=prompt('Prize','Small Red Bag')||'Prize'; winners.push({name,prize}); renderWinners(); winnersModal.style.display='flex'; launchConfetti(3); };
+    document.getElementById('photoInput').onchange = e => Array.from(e.target.files).forEach(file => { const r=new FileReader(); r.onload = ev => createPerson({src:ev.target.result, name:prompt('Name?','Staff')||'Staff', quote:prompt('Quote?','')||'', would:prompt('Would You Rather?','')||''}); r.readAsDataURL(file); });
+    document.getElementById('refreshBtn').onclick = () => { launchConfetti(4); setTimeout(()=>location.reload(),1600); };
+    document.getElementById('winnersBtn').onclick = () => { renderWinners(); winnersModal.style.display='flex'; launchConfetti(2); };
+    document.getElementById('staffBtn').onclick = () => { renderStaffList(); staffModal.style.display='flex'; };
+    document.getElementById('closeStaffBtn').onclick = () => staffModal.style.display='none';
+    document.getElementById('closeWinnersBtn').onclick = () => winnersModal.style.display='none';
+    document.getElementById('closeSpeechBtn').onclick = closeSpotlight;
+    staffList.onclick = e => { const b=e.target.closest('button[data-i]'); if(b){ staffModal.style.display='none'; spotlightPerson(people[Number(b.dataset.i)]); } };
 
-    function point(t,lane){const mx=105+lane*16,my=150+lane*14,w=Math.max(280,innerWidth-mx*2),h=Math.max(210,innerHeight-my*2),per=2*(w+h);let d=(t%1)*per;if(d<w)return{x:mx+d,y:my};d-=w;if(d<h)return{x:mx+w,y:my+d};d-=h;if(d<w)return{x:mx+w-d,y:my+h};d-=w;return{x:mx,y:my+h-d};}
-    function animate(){const now=Date.now();people.forEach(p=>{p.progress+=p.speed;const pos=point(p.progress,p.lane);const near=pos.x>innerWidth-240&&pos.x<innerWidth-30&&pos.y>innerHeight*.32&&pos.y<innerHeight*.72;const spot=now<p.spotlightUntil;const sc=spot?1.9:(near?1.45:p.scale);p.el.style.zIndex=spot?96:(near?70:20+p.lane);p.el.style.transform='translate('+pos.x+'px,'+pos.y+'px) scale('+sc+')';});requestAnimationFrame(animate);}
-    function launchConfetti(b){const colors=['#f43f5e','#0ea5e9','#22c55e','#fde047','#a855f7','#f97316'];let count=0,total=b||1;const timer=setInterval(()=>{for(let i=0;i<70;i++){const pc=document.createElement('div');pc.className='confetti';pc.style.left=rand(0,100)+'vw';pc.style.background=colors[Math.floor(Math.random()*colors.length)];pc.style.animationDelay=rand(0,.4)+'s';document.body.appendChild(pc);setTimeout(()=>pc.remove(),4700);}count++;if(count>=total)clearInterval(timer);},450);}
-
-    document.body.addEventListener('click',()=>document.querySelectorAll('.character.show-quote').forEach(c=>c.classList.remove('show-quote')));
-    loadSheetBtn.addEventListener('click',()=>loadSheetCSV());
-    photoInput.addEventListener('change',e=>Array.from(e.target.files).forEach(file=>{const r=new FileReader();r.onload=ev=>makeCharacter({src:ev.target.result,name:prompt('Name?','Staff')||'Staff',quote:prompt('Quote?','')||'',would:prompt('Would You Rather?','')||''});r.readAsDataURL(file);}));
-    addWinnerBtn.addEventListener('click',()=>{const name=prompt('Winner name:','Cafeteria Lady'); if(!name)return; const prize=prompt('Prize:','Small Red Bag')||'Prize'; winners.push({name,prize}); renderWinners(); winnersModal.style.display='flex'; launchConfetti(3);});
-    clearBtn.addEventListener('click',clearAll);
-    winnersBtn.addEventListener('click',()=>{renderWinners();winnersModal.style.display='flex';launchConfetti(2);});
-    closeWinnersBtn.addEventListener('click',()=>winnersModal.style.display='none');
-    staffBtn.addEventListener('click',()=>{renderStaffList();staffModal.style.display='flex';});
-    closeStaffBtn.addEventListener('click',()=>staffModal.style.display='none');
-    staffListBig.addEventListener('click',e=>{const b=e.target.closest('button'); if(b&&b.dataset.index)showPerson(Number(b.dataset.index));});
-    refreshBtn.addEventListener('click',()=>{launchConfetti(4);setTimeout(()=>location.reload(),1600);});
-
-    renderWinners(); renderStaffList(); loadSheetCSV(DEFAULT_CSV); setTimeout(()=>launchConfetti(3),700); animate();
+    renderWinners(); renderStaffList(); loadSheet(DEFAULT_CSV); setTimeout(()=>launchConfetti(3),700); animate();
   </script>
 </body>
 </html>

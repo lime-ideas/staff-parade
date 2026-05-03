@@ -7,343 +7,282 @@
   <style>
     * { box-sizing: border-box; }
     :root {
-      --black: #111111;
-      --red: #9f111b;
-      --darkred: #61080e;
-      --yellow: #ffeb00;
-      --cream: #fff8d6;
+      --grass1:#2f7d32;
+      --grass2:#256d2a;
+      --path1:#9b1c22;
+      --path2:#151515;
+      --yellow:#ffe600;
+      --stone:#6b7280;
+      --dark:#111827;
+      --white:#f8fafc;
     }
     body {
-      margin: 0;
-      overflow: hidden;
-      font-family: Impact, Arial Black, Arial, sans-serif;
-      background: #111;
-      color: white;
+      margin:0;
+      overflow:hidden;
+      background:#111;
+      font-family: monospace, Arial, sans-serif;
+      color:#111;
+      image-rendering: pixelated;
     }
     #app {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
+      position:fixed;
+      inset:0;
+      overflow:hidden;
       background:
-        linear-gradient(90deg, transparent 0 calc(100% - 190px), var(--yellow) calc(100% - 190px) 100%),
-        repeating-conic-gradient(from 0deg, #111 0 25%, #8b1118 0 50%) 0 0 / 78px 78px;
-    }
-    #app::after {
-      content: '';
-      position: absolute;
-      inset: 0 190px 0 0;
-      background: radial-gradient(circle at center, rgba(255,255,255,.08), transparent 35%);
-      pointer-events: none;
+        linear-gradient(90deg, transparent 0 calc(100% - 170px), var(--yellow) calc(100% - 170px) 100%),
+        repeating-conic-gradient(var(--grass1) 0 25%, var(--grass2) 0 50%) 0 0 / 64px 64px;
     }
     .yellow-lane {
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: 190px;
-      height: 100%;
-      background: var(--yellow);
-      border-left: 6px solid #111;
-      z-index: 2;
-      box-shadow: inset 12px 0 rgba(0,0,0,.15);
+      position:absolute;
+      right:0;
+      top:0;
+      width:170px;
+      height:100%;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,.18), transparent 20%),
+        repeating-conic-gradient(#ffe600 0 25%, #f3d900 0 50%) 0 0 / 42px 42px;
+      border-left:8px solid #111;
+      z-index:3;
     }
-    .lane-title {
-      position: absolute;
-      top: 155px;
-      right: 18px;
-      width: 150px;
-      color: #111;
-      text-align: center;
-      font-size: 22px;
-      line-height: .95;
-      transform: rotate(90deg);
-      opacity: .7;
+    .yellow-lane::after {
+      content:'ENTRY LANE';
+      position:absolute;
+      top:45%;
+      left:50%;
+      transform:translate(-50%,-50%) rotate(90deg);
+      font-size:20px;
+      font-weight:900;
+      letter-spacing:2px;
+      color:#111;
+      opacity:.55;
+      white-space:nowrap;
     }
-    .center-logo {
-      position: absolute;
-      left: calc((100vw - 190px) / 2);
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: min(38vw, 360px);
-      aspect-ratio: 1;
-      border-radius: 50%;
-      z-index: 4;
-      background: radial-gradient(circle, #111 0 46%, #8b1118 47% 70%, white 71% 78%, transparent 79%);
-      border: 8px solid rgba(255,255,255,.8);
-      display: grid;
-      place-items: center;
-      box-shadow: 0 18px 50px rgba(0,0,0,.45), inset 0 0 35px rgba(255,255,255,.1);
-      pointer-events: none;
+    .path {
+      position:absolute;
+      left:54px;
+      top:118px;
+      right:220px;
+      bottom:70px;
+      border:10px solid #111;
+      background:
+        repeating-conic-gradient(var(--path1) 0 25%, var(--path2) 0 50%) 0 0 / 64px 64px;
+      box-shadow: inset 0 0 0 8px rgba(255,255,255,.08), 12px 12px 0 rgba(0,0,0,.35);
+      z-index:1;
     }
-    .center-logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 50%;
+    .center-stage {
+      position:absolute;
+      left:calc((100vw - 170px) / 2);
+      top:52%;
+      transform:translate(-50%,-50%);
+      width:min(28vw, 300px);
+      height:min(28vw, 300px);
+      min-width:210px;
+      min-height:210px;
+      background:
+        linear-gradient(45deg, #4b5563 25%, transparent 25%),
+        linear-gradient(-45deg, #4b5563 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #374151 75%),
+        linear-gradient(-45deg, transparent 75%, #374151 75%);
+      background-size:44px 44px;
+      background-position:0 0,0 22px,22px -22px,-22px 0;
+      background-color:#6b7280;
+      border:10px solid #111;
+      box-shadow:10px 10px 0 rgba(0,0,0,.45);
+      z-index:4;
+      display:grid;
+      place-items:center;
+      text-align:center;
     }
-    .logo-fallback {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      color: white;
-      font-size: clamp(24px, 4vw, 46px);
-      line-height: .92;
-      padding: 38px;
-      text-shadow: 3px 3px #000;
+    .center-stage .school {
+      width:72%;
+      height:72%;
+      border:8px solid #111;
+      background:#9b1c22;
+      box-shadow:6px 6px 0 rgba(0,0,0,.35);
+      display:grid;
+      place-items:center;
+      color:white;
+      font-weight:900;
+      font-size:clamp(18px,3vw,34px);
+      line-height:1;
+      text-shadow:3px 3px #111;
+      padding:12px;
     }
-    .logo-fallback span { font-size: 68px; display: block; }
+    .center-stage .school::before { content:'🐻'; display:block; font-size:48px; text-shadow:none; }
 
     .topbar {
-      position: fixed;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 100;
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-      width: min(96vw, 1000px);
-      pointer-events: none;
+      position:fixed;
+      top:12px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:100;
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      align-items:center;
+      width:min(94vw,960px);
+      flex-wrap:wrap;
     }
     .top-btn {
-      pointer-events: auto;
-      border: 5px solid #111;
-      background: #fff;
-      color: #111;
-      border-radius: 6px;
-      padding: 9px 14px;
-      font-weight: 1000;
-      font-size: 15px;
-      box-shadow: 6px 6px 0 rgba(0,0,0,.35);
-      cursor: pointer;
-      text-transform: uppercase;
+      border:5px solid #111;
+      background:#f8fafc;
+      box-shadow:6px 6px 0 rgba(0,0,0,.55);
+      padding:8px 12px;
+      color:#111;
+      font-size:15px;
+      font-weight:900;
+      font-family:monospace, Arial, sans-serif;
+      cursor:pointer;
+      text-transform:uppercase;
     }
-    .top-btn.refresh { background: #ffe85b; }
-    .top-btn span { display: block; font-size: 9px; opacity: .7; }
+    .top-btn.refresh { background:#ffe600; min-width:260px; }
+    .top-btn span { display:block; font-size:9px; opacity:.65; }
 
     .admin-bar {
-      position: fixed;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 120;
-      display: none;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: min(96vw, 1100px);
-      background: rgba(255,255,255,.92);
-      padding: 10px;
-      border: 5px solid #111;
-      box-shadow: 6px 6px 0 rgba(0,0,0,.35);
+      position:fixed;
+      bottom:10px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:130;
+      display:none;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:center;
+      width:min(96vw,1100px);
+      background:#f8fafc;
+      border:5px solid #111;
+      box-shadow:6px 6px 0 rgba(0,0,0,.55);
+      padding:10px;
     }
-    .admin-bar.show { display: flex; }
-    .admin-bar input { min-width: 360px; padding: 10px; border: 3px solid #111; font-weight: 900; }
+    .admin-bar input { min-width:360px; padding:10px; border:4px solid #111; font-weight:900; font-family:monospace; }
+    .admin-bar.show { display:flex; }
     .btn, label.upload-btn {
-      border: 3px solid #111;
-      background: #9f111b;
-      color: white;
-      padding: 9px 12px;
-      font-weight: 1000;
-      cursor: pointer;
-      box-shadow: 3px 3px 0 #111;
+      border:4px solid #111;
+      background:#9b1c22;
+      color:white;
+      padding:9px 12px;
+      font-weight:900;
+      font-family:monospace;
+      cursor:pointer;
+      box-shadow:4px 4px 0 rgba(0,0,0,.45);
     }
-    input[type=file] { display: none; }
+    input[type=file]{display:none;}
 
-    .stage { position: absolute; inset: 0; z-index: 10; }
-
-    .pixel-person {
-      position: absolute;
-      width: 62px;
-      height: 92px;
-      cursor: pointer;
-      transform-origin: center bottom;
-      image-rendering: pixelated;
-      z-index: 20;
-      transition: filter .15s ease;
+    .stage { position:absolute; inset:0; z-index:10; }
+    .player {
+      position:absolute;
+      width:48px;
+      height:88px;
+      transform-origin:center bottom;
+      cursor:pointer;
+      z-index:20;
+      image-rendering:pixelated;
     }
-    .pixel-person.spotlight {
-      z-index: 180 !important;
-      filter: drop-shadow(0 0 18px #fff) drop-shadow(0 0 28px #ffe600);
+    .player.spotlight { z-index:180!important; filter:drop-shadow(0 0 0 #fff) drop-shadow(0 0 18px #ffe600); }
+    .head {
+      position:absolute;
+      top:0;
+      left:7px;
+      width:34px;
+      height:34px;
+      border:4px solid #111;
+      background:#e8b98e;
+      overflow:hidden;
+      box-shadow:3px 3px 0 rgba(0,0,0,.4);
     }
-    .selfie-head {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 44px;
-      height: 44px;
-      border: 4px solid #111;
-      background: #f8d7b0;
-      border-radius: 50%;
-      overflow: hidden;
-      z-index: 5;
-      box-shadow: 3px 3px 0 rgba(0,0,0,.35);
+    .head img { width:100%; height:100%; object-fit:cover; image-rendering:auto; }
+    .torso {
+      position:absolute;
+      top:34px;
+      left:4px;
+      width:40px;
+      height:34px;
+      background:var(--shirt);
+      border:4px solid #111;
+      box-shadow:3px 3px 0 rgba(0,0,0,.35);
     }
-    .selfie-head img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .legs {
+      position:absolute;
+      top:66px;
+      left:7px;
+      width:34px;
+      height:18px;
+      background:linear-gradient(90deg, var(--pants) 0 45%, #111 45% 55%, var(--pants) 55% 100%);
+      border:4px solid #111;
+      animation:walk .28s infinite alternate;
     }
-    .hair {
-      position: absolute;
-      top: -2px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 52px;
-      height: 25px;
-      border-radius: 30px 30px 8px 8px;
-      background: var(--hair);
-      border: 3px solid #111;
-      z-index: 4;
+    @keyframes walk { from{ transform:translateX(-2px);} to{ transform:translateX(2px);} }
+    .name-tag {
+      position:absolute;
+      top:85px;
+      left:50%;
+      transform:translateX(-50%);
+      background:#fff;
+      color:#111;
+      border:3px solid #111;
+      padding:1px 4px;
+      font-size:8px;
+      font-weight:900;
+      max-width:78px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      box-shadow:2px 2px 0 rgba(0,0,0,.4);
     }
-    .body {
-      position: absolute;
-      top: 39px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 54px;
-      height: 45px;
-      background: var(--shirt);
-      border: 4px solid #111;
-      border-radius: 16px 16px 10px 10px;
-      z-index: 2;
+    .winner-badge {
+      position:absolute;
+      top:70px;
+      left:50%;
+      transform:translateX(-50%);
+      width:52px;
+      height:22px;
+      display:none;
+      place-items:center;
+      background:#fbbf24;
+      border:3px solid #111;
+      color:#111;
+      font-size:7px;
+      font-weight:900;
+      text-align:center;
+      line-height:.85;
+      box-shadow:3px 3px 0 rgba(0,0,0,.45);
     }
-    .pants {
-      position: absolute;
-      top: 72px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 48px;
-      height: 18px;
-      background: var(--pants);
-      border: 4px solid #111;
-      border-radius: 0 0 10px 10px;
-      z-index: 1;
-    }
-    .feet {
-      position: absolute;
-      top: 88px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 54px;
-      height: 8px;
-      background: #111;
-      border-radius: 999px;
-      animation: feetWalk .3s infinite alternate;
-    }
-    @keyframes feetWalk { from { width: 46px; } to { width: 60px; } }
-    .name-mini {
-      position: absolute;
-      top: 94px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #fff;
-      color: #111;
-      border: 3px solid #111;
-      font-size: 9px;
-      font-weight: 1000;
-      max-width: 78px;
-      padding: 2px 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      box-shadow: 2px 2px 0 rgba(0,0,0,.3);
-    }
-    .winner-chain {
-      position: absolute;
-      top: 76px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: none;
-      width: 62px;
-      z-index: 8;
-      pointer-events: none;
-    }
-    .is-winner .winner-chain { display: block; }
-    .chain-medal {
-      margin: 0 auto;
-      width: 58px;
-      height: 26px;
-      background: linear-gradient(135deg,#fff7ad,#f59e0b,#b45309);
-      color: #111;
-      border: 3px solid #111;
-      border-radius: 6px;
-      font-size: 7px;
-      font-weight: 1000;
-      line-height: .9;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      box-shadow: 3px 3px 0 rgba(0,0,0,.35);
-    }
+    .is-winner .winner-badge { display:grid; }
 
     .speech {
-      position: fixed;
-      left: 50%;
-      bottom: 22px;
-      transform: translateX(-50%);
-      width: min(92vw, 720px);
-      background: #fff;
-      color: #111;
-      border: 6px solid #111;
-      box-shadow: 8px 8px 0 rgba(0,0,0,.45);
-      z-index: 190;
-      padding: 18px;
-      display: none;
-      text-align: center;
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      z-index:200;
+      display:none;
+      width:min(92vw,740px);
+      background:#fff;
+      color:#111;
+      border:7px solid #111;
+      box-shadow:10px 10px 0 rgba(0,0,0,.55);
+      padding:18px;
+      text-align:center;
     }
-    .speech.show { display: block; }
-    .speech h2 { margin: 0 0 8px; font-size: 34px; color: #9f111b; }
-    .speech p { margin: 6px 0; font-size: 22px; font-family: Arial, sans-serif; font-weight: 900; }
-    .speech .close { margin-top: 10px; }
+    .speech.show { display:block; }
+    .speech h2 { margin:0 0 8px; color:#9b1c22; font-size:34px; }
+    .speech p { margin:6px 0; font-size:20px; font-family:Arial,sans-serif; font-weight:900; }
 
-    .modal {
-      position: fixed;
-      inset: 0;
-      z-index: 210;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,.65);
-      padding: 20px;
-    }
-    .modal-card {
-      width: min(92vw, 760px);
-      max-height: 88vh;
-      overflow-y: auto;
-      background: #fff;
-      color: #111;
-      border: 8px solid #111;
-      box-shadow: 10px 10px 0 rgba(0,0,0,.55);
-      padding: 25px;
-      text-align: center;
-    }
-    .modal-card h2 { margin: 0 0 14px; font-size: clamp(34px, 7vw, 70px); color: #9f111b; }
-    .grid-list { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
-    .list-item {
-      background: #ffe85b;
-      border: 5px solid #111;
-      padding: 12px;
-      font-size: 18px;
-      font-weight: 1000;
-      box-shadow: 5px 5px 0 rgba(0,0,0,.35);
-      cursor: pointer;
-    }
-    .winner-item { background: #fff2a8; font-size: 24px; }
-    .confetti { position: fixed; top: -20px; width: 12px; height: 18px; z-index: 300; animation: fall 4.3s linear forwards; }
-    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+    .modal { position:fixed; inset:0; z-index:220; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.68); padding:20px; }
+    .modal-card { width:min(92vw,760px); max-height:88vh; overflow-y:auto; background:#fff; color:#111; border:8px solid #111; box-shadow:10px 10px 0 rgba(0,0,0,.55); padding:24px; text-align:center; }
+    .modal-card h2 { margin:0 0 16px; color:#9b1c22; font-size:clamp(34px,7vw,68px); }
+    .grid-list { display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); }
+    .list-item { background:#ffe600; border:5px solid #111; box-shadow:5px 5px 0 rgba(0,0,0,.45); padding:12px; font-size:17px; font-weight:900; cursor:pointer; font-family:monospace; }
+    .winner-item { background:#fff1a8; font-size:22px; }
+    .confetti { position:fixed; top:-20px; width:12px; height:18px; z-index:300; animation:fall 4.3s linear forwards; }
+    @keyframes fall { to { transform:translateY(110vh) rotate(720deg); } }
   </style>
 </head>
 <body>
   <div id="app">
-    <div class="yellow-lane"><div class="lane-title">ENTRY<br>LANE</div></div>
-    <div class="center-logo" id="centerLogo">
-      <img src="logo.png" onerror="this.style.display='none'" alt="Lime Street Logo">
-      <div class="logo-fallback"><span>🐻</span>LIME STREET<br>ELEMENTARY</div>
-    </div>
+    <div class="path"></div>
+    <div class="yellow-lane"></div>
+    <div class="center-stage"><div class="school">LIME STREET<br>ELEMENTARY</div></div>
     <div class="stage" id="stage"></div>
   </div>
 
@@ -355,151 +294,59 @@
 
   <div class="admin-bar" id="adminBar">
     <input id="sheetUrl" placeholder="Paste published Google Sheet CSV link" />
-    <button class="btn purple" id="loadBtn">Load Responses</button>
+    <button class="btn" id="loadBtn">Load</button>
     <label class="upload-btn" for="photoInput">Manual Upload</label>
     <input id="photoInput" type="file" accept="image/*" multiple />
-    <button class="btn green" id="addWinnerBtn">Add Winner</button>
-    <button class="btn dark" id="clearBtn">Clear</button>
+    <button class="btn" id="addWinnerBtn">Add Winner</button>
+    <button class="btn" id="clearBtn">Clear</button>
   </div>
 
   <div class="speech" id="speechBox">
     <h2 id="speechName">Name</h2>
     <p id="speechQuote">Quote</p>
-    <p id="speechWould">Would you rather</p>
-    <button class="btn pink close" id="closeSpeechBtn">Back to Parade</button>
+    <p id="speechWould"></p>
+    <button class="btn" id="closeSpeechBtn">Back to Parade</button>
   </div>
 
-  <div class="modal" id="staffModal"><div class="modal-card"><h2>📋 Staff List</h2><div class="grid-list" id="staffList"></div><br><button class="btn pink" id="closeStaffBtn">Back</button></div></div>
-  <div class="modal" id="winnersModal"><div class="modal-card"><h2>🏆 Winners</h2><div class="grid-list" id="winnersList"></div><br><button class="btn pink" id="closeWinnersBtn">Back</button></div></div>
+  <div class="modal" id="staffModal"><div class="modal-card"><h2>📋 Staff List</h2><div class="grid-list" id="staffList"></div><br><button class="btn" id="closeStaffBtn">Back</button></div></div>
+  <div class="modal" id="winnersModal"><div class="modal-card"><h2>🏆 Winners</h2><div class="grid-list" id="winnersList"></div><br><button class="btn" id="closeWinnersBtn">Back</button></div></div>
 
   <script>
     const DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwz4lMDeYja7-Vluu-B8-StkdVcoMMQSS2-nYsrQxtOSm4SK-IwmJhSpvUlqK5TqrkHZKIVEz_RihC/pub?output=csv';
     const MAX_PEOPLE = 110;
-    const stage = document.getElementById('stage');
-    const adminBar = document.getElementById('adminBar');
-    const staffList = document.getElementById('staffList');
-    const winnersList = document.getElementById('winnersList');
-    const staffModal = document.getElementById('staffModal');
-    const winnersModal = document.getElementById('winnersModal');
-    const speechBox = document.getElementById('speechBox');
-    const speechName = document.getElementById('speechName');
-    const speechQuote = document.getElementById('speechQuote');
-    const speechWould = document.getElementById('speechWould');
+    const stage=document.getElementById('stage'), adminBar=document.getElementById('adminBar'), staffList=document.getElementById('staffList'), winnersList=document.getElementById('winnersList');
+    const staffModal=document.getElementById('staffModal'), winnersModal=document.getElementById('winnersModal'), speechBox=document.getElementById('speechBox');
+    let people=[], winners=[];
+    const isAdmin=new URLSearchParams(location.search).get('admin')==='1';
+    if(isAdmin) adminBar.classList.add('show');
+    const shirts=['#2563eb','#16a34a','#dc2626','#9333ea','#f97316','#06b6d4','#ec4899','#facc15'];
+    const pants=['#111827','#374151','#1e3a8a','#14532d','#581c87'];
+    function rand(a,b){return Math.random()*(b-a)+a;} function pick(a){return a[Math.floor(Math.random()*a.length)];}
+    function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+    function fallbackFace(){return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="#e8b98e"/><rect x="20" y="30" width="18" height="18" fill="white"/><rect x="62" y="30" width="18" height="18" fill="white"/><rect x="28" y="37" width="7" height="7" fill="#111"/><rect x="69" y="37" width="7" height="7" fill="#111"/><rect x="34" y="66" width="32" height="7" fill="#111"/></svg>');}
+    function driveImage(url){const t=String(url||'').trim();const m=t.match(/[?&]id=([^&]+)/)||t.match(/\/d\/([^/]+)/);return m&&m[1]?'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w700':t;}
 
-    let people = [];
-    let winners = [];
-    const isAdmin = new URLSearchParams(location.search).get('admin') === '1';
-    if (isAdmin) adminBar.style.display = 'flex';
-
-    const palettes = {
-      shirts: ['#2563eb','#16a34a','#dc2626','#9333ea','#f97316','#06b6d4','#ec4899','#facc15'],
-      pants: ['#111827','#374151','#1e3a8a','#14532d','#581c87'],
-      hair: ['#111111','#5c3317','#facc15','#ef4444','#1d4ed8','#6b7280']
-    };
-    function rand(a,b){ return Math.random()*(b-a)+a; }
-    function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-    function esc(v){ return String(v||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-    function fallbackFace(){ return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="#f8d7b0"/><circle cx="100" cy="100" r="78" fill="#f8d7b0"/><circle cx="75" cy="86" r="18" fill="white"/><circle cx="125" cy="86" r="18" fill="white"/><circle cx="75" cy="86" r="7" fill="#111"/><circle cx="125" cy="86" r="7" fill="#111"/><path d="M68 125 Q100 150 132 125" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/></svg>'); }
-    function driveImage(url){ const t=String(url||'').trim(); const m=t.match(/[?&]id=([^&]+)/)||t.match(/\/d\/([^/]+)/); return m&&m[1] ? 'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w700' : t; }
-
-    function createPerson(data){
-      const p = {
-        name: data.name || 'Staff', quote: data.quote || 'Happy Staff Appreciation Week!', would: data.would || '',
-        src: data.src || fallbackFace(), winner: String(data.raffleWinner||'').trim().toLowerCase()==='yes', prize: data.prize || '',
-        lane: Math.floor(rand(0,4)), speed: rand(.00008,.00032), progress: rand(.78, .98), laps: 0, state: 'entry', restUntil: 0,
-        shirt: pick(palettes.shirts), pants: pick(palettes.pants), hair: pick(palettes.hair), spotlight: false
-      };
-      const el = document.createElement('div');
-      el.className = p.winner ? 'pixel-person is-winner' : 'pixel-person';
-      el.style.setProperty('--shirt', p.shirt);
-      el.style.setProperty('--pants', p.pants);
-      el.style.setProperty('--hair', p.hair);
-      el.innerHTML = '<div class="hair"></div><div class="selfie-head"><img alt="'+esc(p.name)+'"></div><div class="body"></div><div class="pants"></div><div class="feet"></div><div class="name-mini">'+esc(p.name)+'</div><div class="winner-chain"><div class="chain-medal">RAFFLE<br>WINNER</div></div>';
-      const img = el.querySelector('img'); img.src = p.src; img.onerror = () => { img.src = fallbackFace(); };
-      el.addEventListener('click', e => { e.stopPropagation(); spotlightPerson(p); });
-      stage.appendChild(el); p.el = el; people.push(p); renderStaffList(); return p;
+    function createPerson(d){
+      const p={name:d.name||'Staff',quote:d.quote||'Happy Staff Appreciation Week!',would:d.would||'',src:d.src||fallbackFace(),winner:String(d.raffleWinner||'').trim().toLowerCase()==='yes',prize:d.prize||'',lane:Math.floor(rand(0,4)),speed:rand(.00008,.00030),progress:rand(.78,.98),laps:0,state:'entry',restUntil:0,shirt:pick(shirts),pants:pick(pants),spotlight:false};
+      const el=document.createElement('div'); el.className=p.winner?'player is-winner':'player'; el.style.setProperty('--shirt',p.shirt); el.style.setProperty('--pants',p.pants);
+      el.innerHTML='<div class="head"><img alt="'+esc(p.name)+'"></div><div class="torso"></div><div class="legs"></div><div class="name-tag">'+esc(p.name)+'</div><div class="winner-badge">RAFFLE<br>WINNER</div>';
+      const img=el.querySelector('img'); img.src=p.src; img.onerror=()=>{img.src=fallbackFace();};
+      el.onclick=e=>{e.stopPropagation();spotlightPerson(p);}; stage.appendChild(el); p.el=el; people.push(p); renderStaffList(); return p;
     }
-
-    function paradePoint(t, lane){
-      const yellow = 190; const margin = 88 + lane*26; const top = 138 + lane*18;
-      const left = margin; const right = innerWidth - yellow - margin; const bottom = innerHeight - 125 - lane*16;
-      const w = Math.max(280, right-left), h = Math.max(180, bottom-top), per = 2*(w+h);
-      let d = (t%1)*per;
-      if(d < w) return {x:left+d,y:top}; d-=w;
-      if(d < h) return {x:right,y:top+d}; d-=h;
-      if(d < w) return {x:right-d,y:bottom}; d-=w;
-      return {x:left,y:bottom-d};
-    }
-    function centerPoint(){ return { x:(innerWidth-190)/2 - 31, y:innerHeight/2 - 70 }; }
-    function entryPoint(p){ return { x: innerWidth - 145 + (p.lane%2)*45, y: 170 + p.lane*95 + Math.sin(Date.now()/600+p.lane)*12 }; }
-
-    function animate(){
-      const now = Date.now();
-      people.forEach(p => {
-        let pos, scale = .78, z = 20 + p.lane;
-        if(p.spotlight){ pos = centerPoint(); scale = 2.45; z = 185; }
-        else if(p.state === 'rest'){
-          pos = entryPoint(p); scale = .72; z = 30;
-          if(now > p.restUntil){ p.state = 'entry'; p.progress = .01; }
-        } else {
-          const before = p.progress; p.progress += p.speed;
-          if(p.progress >= 1){ p.progress -= 1; p.laps++; }
-          if(p.laps >= 3 && p.progress > .72){ p.state = 'rest'; p.restUntil = now + rand(2500,7000); p.laps = 0; pos = entryPoint(p); }
-          else pos = paradePoint(p.progress, p.lane);
-          const nearLogo = Math.abs(pos.x - ((innerWidth-190)/2)) < 170 && Math.abs(pos.y - innerHeight/2) < 150;
-          if(nearLogo){ scale = 1.05; z = 60; }
-        }
-        p.el.style.zIndex = z;
-        p.el.style.transform = 'translate('+pos.x+'px,'+pos.y+'px) scale('+scale+')';
-      });
-      requestAnimationFrame(animate);
-    }
-
-    function spotlightPerson(p){
-      people.forEach(x => { x.spotlight=false; x.el.classList.remove('spotlight'); });
-      p.spotlight = true; p.el.classList.add('spotlight');
-      speechName.textContent = p.name;
-      speechQuote.textContent = '💬 “' + p.quote + '”';
-      speechWould.textContent = p.would ? '🤔 Would you rather: ' + p.would : '';
-      speechBox.classList.add('show');
-      launchConfetti(1);
-    }
-    function closeSpotlight(){ people.forEach(p => { p.spotlight=false; p.el.classList.remove('spotlight'); }); speechBox.classList.remove('show'); }
-
-    function parseCSV(text){ const rows=[]; let row=[], cell='', q=false; for(let i=0;i<text.length;i++){ const c=text[i], n=text[i+1]; if(c==='"'&&q&&n==='"'){cell+='"';i++;} else if(c==='"') q=!q; else if(c===','&&!q){row.push(cell);cell='';} else if((c==='\n'||c==='\r')&&!q){ if(cell||row.length){row.push(cell);rows.push(row);row=[];cell='';} if(c==='\r'&&n==='\n')i++; } else cell+=c; } if(cell||row.length){row.push(cell);rows.push(row);} return rows; }
-    async function loadSheet(url){
-      try{
-        const res = await fetch(url || document.getElementById('sheetUrl').value.trim() || DEFAULT_CSV); if(!res.ok) throw new Error('Could not load sheet');
-        const rows = parseCSV(await res.text()).filter(r => r.some(c => String(c).trim() !== '')); if(rows.length < 2) return;
-        const h = rows[0].map(x => String(x).trim().toLowerCase());
-        const ni = h.findIndex(x=>x.includes('name')), qi=h.findIndex(x=>x.includes('quote')), wi=h.findIndex(x=>x.includes('would')), ii=h.findIndex(x=>x.includes('photo')||x.includes('selfie')||x.includes('pic')||x.includes('image')), ri=h.findIndex(x=>x.includes('raffle winner')), pi=h.findIndex(x=>x.includes('prize'));
-        clearAll(false);
-        rows.slice(1,MAX_PEOPLE+1).forEach(row => {
-          const name = row[ni] || 'Staff', raffle = ri>=0 ? row[ri] : '', prize = pi>=0 ? row[pi] : '';
-          if(String(raffle).trim().toLowerCase()==='yes') winners.push({name, prize: prize || 'Prize Bag'});
-          createPerson({ name, quote: qi>=0?row[qi]:'', would: wi>=0?row[wi]:'', src: ii>=0?driveImage(row[ii]):fallbackFace(), raffleWinner: raffle, prize });
-        });
-        renderWinners(); renderStaffList();
-      } catch(err){ console.error(err); if(isAdmin) alert(err.message); }
-    }
-    function clearAll(resetWinners=true){ people.forEach(p=>p.el.remove()); people=[]; if(resetWinners) winners=[]; renderWinners(); renderStaffList(); }
-    function renderStaffList(){ staffList.innerHTML = people.length ? people.map((p,i)=>'<button class="list-item" data-i="'+i+'">'+esc(p.name)+'</button>').join('') : '<div class="list-item">No staff loaded yet</div>'; }
-    function renderWinners(){ winnersList.innerHTML = winners.length ? winners.map(w=>'<div class="list-item winner-item">🎉 '+esc(w.name)+'<br><span>'+esc(w.prize)+'</span></div>').join('') : '<div class="list-item winner-item">No winners yet</div>'; }
-    function launchConfetti(bursts){ const colors=['#f43f5e','#0ea5e9','#22c55e','#fde047','#a855f7','#f97316']; let count=0; const timer=setInterval(()=>{ for(let i=0;i<70;i++){ const pc=document.createElement('div'); pc.className='confetti'; pc.style.left=rand(0,100)+'vw'; pc.style.background=pick(colors); pc.style.animationDelay=rand(0,.5)+'s'; document.body.appendChild(pc); setTimeout(()=>pc.remove(),4800); } if(++count >= (bursts||1)) clearInterval(timer); },450); }
-
-    document.getElementById('loadBtn').onclick = () => loadSheet();
-    document.getElementById('clearBtn').onclick = () => clearAll();
-    document.getElementById('addWinnerBtn').onclick = () => { const name=prompt('Winner name','Cafeteria Lady'); if(!name)return; const prize=prompt('Prize','Small Red Bag')||'Prize'; winners.push({name,prize}); renderWinners(); winnersModal.style.display='flex'; launchConfetti(3); };
-    document.getElementById('photoInput').onchange = e => Array.from(e.target.files).forEach(file => { const r=new FileReader(); r.onload = ev => createPerson({src:ev.target.result, name:prompt('Name?','Staff')||'Staff', quote:prompt('Quote?','')||'', would:prompt('Would You Rather?','')||''}); r.readAsDataURL(file); });
-    document.getElementById('refreshBtn').onclick = () => { launchConfetti(4); setTimeout(()=>location.reload(),1600); };
-    document.getElementById('winnersBtn').onclick = () => { renderWinners(); winnersModal.style.display='flex'; launchConfetti(2); };
-    document.getElementById('staffBtn').onclick = () => { renderStaffList(); staffModal.style.display='flex'; };
-    document.getElementById('closeStaffBtn').onclick = () => staffModal.style.display='none';
-    document.getElementById('closeWinnersBtn').onclick = () => winnersModal.style.display='none';
-    document.getElementById('closeSpeechBtn').onclick = closeSpotlight;
-    staffList.onclick = e => { const b=e.target.closest('button[data-i]'); if(b){ staffModal.style.display='none'; spotlightPerson(people[Number(b.dataset.i)]); } };
-
-    renderWinners(); renderStaffList(); loadSheet(DEFAULT_CSV); setTimeout(()=>launchConfetti(3),700); animate();
+    function paradePoint(t,lane){const yellow=170,left=80+lane*16,right=innerWidth-yellow-95-lane*16,top=150+lane*15,bottom=innerHeight-105-lane*12;const w=Math.max(260,right-left),h=Math.max(180,bottom-top),per=2*(w+h);let d=(t%1)*per;if(d<w)return{x:left+d,y:top};d-=w;if(d<h)return{x:right,y:top+d};d-=h;if(d<w)return{x:right-d,y:bottom};d-=w;return{x:left,y:bottom-d};}
+    function entryPoint(p){return{x:innerWidth-132+(p.lane%2)*38,y:170+p.lane*90+Math.sin(Date.now()/600+p.lane)*14};}
+    function centerPoint(){return{x:(innerWidth-170)/2-24,y:innerHeight/2-70};}
+    function animate(){const now=Date.now();people.forEach(p=>{let pos,scale=.78,z=20+p.lane;if(p.spotlight){pos=centerPoint();scale=2.8;z=180;}else if(p.state==='rest'){pos=entryPoint(p);scale=.72;z=25;if(now>p.restUntil){p.state='entry';p.progress=.01;}}else{p.progress+=p.speed;if(p.progress>=1){p.progress-=1;p.laps++;}if(p.laps>=3&&p.progress>.72){p.state='rest';p.restUntil=now+rand(2500,7000);p.laps=0;pos=entryPoint(p);}else{pos=paradePoint(p.progress,p.lane);}const near=Math.abs(pos.x-((innerWidth-170)/2))<150&&Math.abs(pos.y-innerHeight/2)<130;if(near){scale=1.05;z=60;}}p.el.style.zIndex=z;p.el.style.transform='translate('+pos.x+'px,'+pos.y+'px) scale('+scale+')';});requestAnimationFrame(animate);}
+    function spotlightPerson(p){people.forEach(x=>{x.spotlight=false;x.el.classList.remove('spotlight');});p.spotlight=true;p.el.classList.add('spotlight');document.getElementById('speechName').textContent=p.name;document.getElementById('speechQuote').textContent='💬 “'+p.quote+'”';document.getElementById('speechWould').textContent=p.would?'🤔 Would you rather: '+p.would:'';speechBox.classList.add('show');launchConfetti(1);}
+    function closeSpotlight(){people.forEach(p=>{p.spotlight=false;p.el.classList.remove('spotlight');});speechBox.classList.remove('show');}
+    function parseCSV(text){const rows=[];let row=[],cell='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'&&q&&n==='"'){cell+='"';i++;}else if(c==='"')q=!q;else if(c===','&&!q){row.push(cell);cell='';}else if((c==='\n'||c==='\r')&&!q){if(cell||row.length){row.push(cell);rows.push(row);row=[];cell='';}if(c==='\r'&&n==='\n')i++;}else cell+=c;}if(cell||row.length){row.push(cell);rows.push(row);}return rows;}
+    async function loadSheet(url){try{const res=await fetch(url||document.getElementById('sheetUrl').value.trim()||DEFAULT_CSV);if(!res.ok)throw new Error('Could not load sheet');const rows=parseCSV(await res.text()).filter(r=>r.some(c=>String(c).trim()!==''));if(rows.length<2)return;const h=rows[0].map(x=>String(x).trim().toLowerCase());const ni=h.findIndex(x=>x.includes('name')),qi=h.findIndex(x=>x.includes('quote')),wi=h.findIndex(x=>x.includes('would')),ii=h.findIndex(x=>x.includes('photo')||x.includes('selfie')||x.includes('pic')||x.includes('image')),ri=h.findIndex(x=>x.includes('raffle winner')),pi=h.findIndex(x=>x.includes('prize'));clearAll(false);rows.slice(1,MAX_PEOPLE+1).forEach(row=>{const name=row[ni]||'Staff',raffle=ri>=0?row[ri]:'',prize=pi>=0?row[pi]:'';if(String(raffle).trim().toLowerCase()==='yes')winners.push({name,prize:prize||'Prize Bag'});createPerson({name,quote:qi>=0?row[qi]:'',would:wi>=0?row[wi]:'',src:ii>=0?driveImage(row[ii]):fallbackFace(),raffleWinner:raffle,prize});});renderWinners();renderStaffList();}catch(e){console.error(e);if(isAdmin)alert(e.message);}}
+    function clearAll(resetWinners=true){people.forEach(p=>p.el.remove());people=[];if(resetWinners)winners=[];renderWinners();renderStaffList();}
+    function renderStaffList(){staffList.innerHTML=people.length?people.map((p,i)=>'<button class="list-item" data-i="'+i+'">'+esc(p.name)+'</button>').join(''):'<div class="list-item">No staff loaded yet</div>';}
+    function renderWinners(){winnersList.innerHTML=winners.length?winners.map(w=>'<div class="list-item winner-item">🎉 '+esc(w.name)+'<br><span>'+esc(w.prize)+'</span></div>').join(''):'<div class="list-item winner-item">No winners yet</div>';}
+    function launchConfetti(b){const colors=['#f43f5e','#0ea5e9','#22c55e','#fde047','#a855f7','#f97316'];let count=0;const timer=setInterval(()=>{for(let i=0;i<65;i++){const pc=document.createElement('div');pc.className='confetti';pc.style.left=rand(0,100)+'vw';pc.style.background=pick(colors);pc.style.animationDelay=rand(0,.5)+'s';document.body.appendChild(pc);setTimeout(()=>pc.remove(),4800);}if(++count>=(b||1))clearInterval(timer);},450);}
+    document.getElementById('loadBtn').onclick=()=>loadSheet();document.getElementById('clearBtn').onclick=()=>clearAll();document.getElementById('addWinnerBtn').onclick=()=>{const name=prompt('Winner name','Cafeteria Lady');if(!name)return;const prize=prompt('Prize','Small Red Bag')||'Prize';winners.push({name,prize});renderWinners();winnersModal.style.display='flex';launchConfetti(3);};document.getElementById('photoInput').onchange=e=>Array.from(e.target.files).forEach(file=>{const r=new FileReader();r.onload=ev=>createPerson({src:ev.target.result,name:prompt('Name?','Staff')||'Staff',quote:prompt('Quote?','')||'',would:prompt('Would You Rather?','')||''});r.readAsDataURL(file);});document.getElementById('refreshBtn').onclick=()=>{launchConfetti(4);setTimeout(()=>location.reload(),1600);};document.getElementById('winnersBtn').onclick=()=>{renderWinners();winnersModal.style.display='flex';launchConfetti(2);};document.getElementById('staffBtn').onclick=()=>{renderStaffList();staffModal.style.display='flex';};document.getElementById('closeStaffBtn').onclick=()=>staffModal.style.display='none';document.getElementById('closeWinnersBtn').onclick=()=>winnersModal.style.display='none';document.getElementById('closeSpeechBtn').onclick=closeSpotlight;staffList.onclick=e=>{const b=e.target.closest('button[data-i]');if(b){staffModal.style.display='none';spotlightPerson(people[Number(b.dataset.i)]);}};
+    renderWinners();renderStaffList();loadSheet(DEFAULT_CSV);setTimeout(()=>launchConfetti(3),700);animate();
   </script>
 </body>
 </html>

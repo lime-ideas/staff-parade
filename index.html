@@ -223,7 +223,6 @@
     <label class="upload-btn" for="photoInput">Manual Upload</label>
     <input id="photoInput" type="file" accept="image/*" multiple />
     <button class="btn green" id="addWinnerBtn">Add Winner</button>
-    <button class="btn pink" id="demoBtn">Demo</button>
     <button class="btn dark" id="clearBtn">Clear</button>
   </div>
 
@@ -246,7 +245,6 @@
     const loadSheetBtn = document.getElementById('loadSheetBtn');
     const photoInput = document.getElementById('photoInput');
     const addWinnerBtn = document.getElementById('addWinnerBtn');
-    const demoBtn = document.getElementById('demoBtn');
     const clearBtn = document.getElementById('clearBtn');
     const winnersList = document.getElementById('winnersList');
     const winnerModal = document.getElementById('winnerModal');
@@ -271,19 +269,29 @@
       if (!url) return '';
       const text = String(url).trim();
 
-      // Handles links like:
-      // https://drive.google.com/open?id=FILE_ID
-      // https://drive.google.com/file/d/FILE_ID/view
-      // https://drive.google.com/uc?id=FILE_ID
+      // Google Forms file uploads often save as Drive links.
+      // The file must be shared as "Anyone with the link can view" or browsers will block it.
       const idMatch = text.match(/[?&]id=([^&]+)/) || text.match(/\/d\/([^/]+)/);
 
       if (idMatch && idMatch[1]) {
         const fileId = idMatch[1];
-        // Thumbnail endpoint works better for Google Form image uploads than uc?export=view
-        return 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w400';
+        return 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w500';
       }
 
       return text;
+    }
+
+    function driveAltImages(url) {
+      const text = String(url || '').trim();
+      const idMatch = text.match(/[?&]id=([^&]+)/) || text.match(/\/d\/([^/]+)/);
+      if (!idMatch || !idMatch[1]) return [];
+      const fileId = idMatch[1];
+      return [
+        'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w500',
+        'https://lh3.googleusercontent.com/d/' + fileId + '=w500',
+        'https://drive.google.com/uc?export=view&id=' + fileId,
+        'https://drive.google.com/uc?id=' + fileId
+      ];
     }
     function fallbackFace() {
       return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="white"/><circle cx="100" cy="100" r="78" fill="#fde68a"/><circle cx="75" cy="85" r="10" fill="#111827"/><circle cx="125" cy="85" r="10" fill="#111827"/><path d="M65 120 Q100 150 135 120" stroke="#111827" stroke-width="9" fill="none" stroke-linecap="round"/></svg>');
@@ -294,6 +302,7 @@
       const quote = data.quote || 'Happy Staff Appreciation Week!';
       const would = data.wouldYouRather || '';
       const src = data.src || fallbackFace();
+      const originalSrc = data.originalSrc || data.src || '';
 
       const el = document.createElement('div');
       el.className = 'character';
@@ -309,8 +318,19 @@
         '<div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div>';
 
       const img = el.querySelector('img');
+      img.dataset.tryIndex = '0';
+      img.dataset.alts = JSON.stringify(driveAltImages(originalSrc));
       img.src = src;
-      img.onerror = function() { img.src = fallbackFace(); };
+      img.onerror = function() {
+        const alts = JSON.parse(img.dataset.alts || '[]');
+        const nextIndex = Number(img.dataset.tryIndex || '0');
+        if (nextIndex < alts.length) {
+          img.dataset.tryIndex = String(nextIndex + 1);
+          img.src = alts[nextIndex];
+        } else {
+          img.src = fallbackFace();
+        }
+      }; 
 
       el.addEventListener('click', function(event) {
         event.stopPropagation();
@@ -400,13 +420,14 @@
             name: row[nameIndex] || 'Staff',
             quote: quoteIndex >= 0 ? row[quoteIndex] : '',
             wouldYouRather: wouldIndex >= 0 ? row[wouldIndex] : '',
-            src: imageIndex >= 0 ? driveImage(row[imageIndex]) : fallbackFace()
+            src: imageIndex >= 0 ? driveImage(row[imageIndex]) : fallbackFace(),
+            originalSrc: imageIndex >= 0 ? row[imageIndex] : ''
           });
         });
       } catch (err) {
         console.error(err);
         if (isAdmin) alert(err.message);
-        if (people.length === 0) createDemoPeople();
+        
       }
     }
 
@@ -450,30 +471,7 @@
       }
     }
 
-    function emojiImage(emoji) {
-      const canvas = document.createElement('canvas');
-      canvas.width = 200;
-      canvas.height = 200;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(0,0,200,200);
-      ctx.font = '120px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(emoji, 100, 110);
-      return canvas.toDataURL();
-    }
-    function createDemoPeople() {
-      clearAll();
-      const demo = [
-        ['Mrs. Sunshine', 'Coffee, kindness, and copy paper save the day.', 'Starbucks', '😀'],
-        ['Mr. High Five', 'Teamwork makes the school work!', 'Donuts', '😎'],
-        ['Cafeteria Lady', 'Serving smiles daily!', 'Small Red Bag', '😄']
-      ];
-      demo.forEach(function(d) {
-        makeCharacter({ src: emojiImage(d[3]), name: d[0], quote: d[1], wouldYouRather: d[2] });
-      });
-    }
+    
 
     function animate() {
       const topSafe = isAdmin ? 118 : 65;
@@ -510,15 +508,11 @@
     loadSheetBtn.addEventListener('click', function() { loadSheetCSV(); });
     photoInput.addEventListener('change', function(e) { addPhotos(e.target.files); });
     addWinnerBtn.addEventListener('click', addWinner);
-    demoBtn.addEventListener('click', createDemoPeople);
     clearBtn.addEventListener('click', clearAll);
     closeWinnerBtn.addEventListener('click', function() { winnerModal.style.display = 'none'; });
 
     renderWinners();
-    createDemoPeople();
-    if (!window.location.href.includes('preview')) {
-      loadSheetCSV(DEFAULT_CSV);
-    }
+    loadSheetCSV(DEFAULT_CSV);
     animate();
   </script>
 </body>

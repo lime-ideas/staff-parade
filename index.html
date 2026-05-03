@@ -23,15 +23,15 @@
 
         #canvas-bg { position: absolute; top: 0; left: 0; z-index: 0; }
 
-        /* HEADER */
+        /* HEADER - Standard Desktop */
         #header-banner {
             position: fixed; top: 15px; right: 20px;
             text-align: right; z-index: 2005; pointer-events: none;
         }
-        #header-banner h1 { margin: 0; font-size: 16px; letter-spacing: 2px; color: var(--tech-gold); text-transform: uppercase; }
-        #header-banner p { margin: 2px 0; font-size: 9px; color: #666; }
+        #header-banner h1 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: 2px; color: var(--tech-gold); text-transform: uppercase; }
+        #header-banner p { margin: 2px 0; font-size: 10px; color: #888; }
 
-        /* MENU CONTROLS */
+        /* MENU CONTROLS - Standard Desktop */
         #command-menu {
             position: fixed; top: 15px; left: 15px;
             width: 220px; z-index: 3000;
@@ -55,17 +55,17 @@
         .staff-link { padding: 10px 15px; font-size: 12px; color: #ccc; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .staff-link:hover { background: var(--tech-gold); color: black; }
 
-        /* STAGE & AVATARS */
+        /* STAGE & PERSPECTIVE */
         #stage { 
             width: 100vw; height: 100vh; 
             display: flex; justify-content: center; align-items: center; 
-            position: relative; z-index: 5; /* Increased z-index */
+            position: relative; z-index: 5;
+            perspective: 1200px;
         }
 
-        /* FIXED LOGO HUB FOR MOBILE */
         #logo-hub { 
             width: 120px; height: 120px; 
-            z-index: 100; pointer-events: none;
+            z-index: 100; cursor: pointer;
             display: flex; justify-content: center; align-items: center;
         }
         #logo-hub img {
@@ -79,31 +79,21 @@
         }
         .face { width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; background-size: cover; background-position: center; position: relative; z-index: 5; }
         
-        /* RADIATING SERVICE RINGS */
         .service-ring {
-            position: absolute; border-radius: 50%;
-            border: 1px solid var(--tech-gold);
-            opacity: 0; pointer-events: none;
-            transition: all 0.6s ease;
+            position: absolute; border-radius: 50%; border: 1px solid var(--tech-gold);
+            opacity: 0; pointer-events: none; transition: all 0.6s ease;
         }
-        .hero .service-ring {
-            opacity: 0.6;
-            animation: ring-pulse 3s infinite alternate;
-        }
-        @keyframes ring-pulse {
-            from { transform: scale(1); opacity: 0.3; }
-            to { transform: scale(1.15); opacity: 0.8; border-color: var(--school-red); }
-        }
+        .hero .service-ring { opacity: 0.6; animation: ring-pulse 3s infinite alternate; }
+        @keyframes ring-pulse { from { transform: scale(1); opacity: 0.3; } to { transform: scale(1.15); opacity: 0.8; border-color: var(--school-red); } }
 
         .winner-glow { border: 3px solid var(--tech-gold) !important; animation: win-pulse 3s infinite ease-in-out; }
         @keyframes win-pulse { 0%, 100% { box-shadow: 0 0 10px var(--tech-gold); } 50% { box-shadow: 0 0 30px var(--tech-gold); } }
 
         .character.hero {
-            animation: none !important; transform: translate(0, 0) scale(2.8) !important;
+            animation: none !important; transform: translate3d(0, 0, 300px) scale(2.8) !important;
             top: 50% !important; left: 50% !important; margin-top: -25px; margin-left: -25px; z-index: 9999;
         }
 
-        /* PROFILE & RAFFLE */
         #profile-card { 
             position: fixed; bottom: 20px; left: 20px; width: calc(100% - 40px); max-width: 300px;
             background: rgba(15,15,15,0.95); border: 1px solid var(--tech-gold); 
@@ -116,9 +106,26 @@
             padding: 25px; z-index: 5000; display: none; backdrop-filter: blur(20px);
         }
 
+        /* MOBILE FIX: PREVENT OVERLAP */
         @media (max-width: 600px) {
-            #logo-hub { width: 100px; height: 100px; }
-            .character.hero { transform: translate(0, 0) scale(2.2) !important; }
+            #header-banner {
+                top: 10px; right: 0; left: 0;
+                text-align: center;
+                width: 100%;
+            }
+            #header-banner h1 { font-size: 14px; }
+            #header-banner p { font-size: 8px; }
+
+            #command-menu {
+                top: 60px; /* Pushed down to clear the header */
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+            }
+            .menu-btn { padding: 10px; font-size: 10px; }
+
+            #logo-hub { width: 90px; height: 90px; }
+            .character.hero { transform: translate3d(0, 0, 150px) scale(2.2) !important; }
         }
     </style>
 </head>
@@ -128,7 +135,7 @@
 
 <div id="header-banner">
     <h1>STAFF APPRECIATION 2026</h1>
-
+    <p>Honoring every one of our Lime Street Staff members</p>
 </div>
 
 <div id="command-menu">
@@ -139,8 +146,7 @@
 </div>
 
 <div id="stage">
-    <!-- Ensure Logo Hub has an image nested inside -->
-    <div id="logo-hub">
+    <div id="logo-hub" onclick="shuffleOrbits()">
         <img src="Lime_Street_Elementary_School_logo_template_300.png" alt="STI LOGO">
     </div>
 </div>
@@ -159,57 +165,50 @@
     let autoCloseTimer = null;
 
     async function init() {
-        const response = await fetch(csvUrl);
-        const data = await response.text();
-        const rows = data.split('\n').slice(1);
-        
-        const dropdown = document.getElementById('staff-dropdown');
-        const winBox = document.getElementById('winner-list-box');
-
-        rows.forEach((row, i) => {
-            const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if(cols.length < 4) return;
+        try {
+            const response = await fetch(csvUrl);
+            const data = await response.text();
+            const rows = data.split('\n').slice(1);
             
-            const staff = {
-                id: `staff-${i}`,
-                name: cols[1].replace(/"/g, '').trim(),
-                quote: cols[2].replace(/"/g, ''),
-                photo: cols[3].trim(),
-                years: parseInt(cols[4]) || 1,
-                isWinner: cols[5]?.toLowerCase().includes('yes'),
-                prize: cols[6] || "Gift"
-            };
-            staffData.push(staff);
-            createAvatar(staff, i);
+            const dropdown = document.getElementById('staff-dropdown');
+            const winBox = document.getElementById('winner-list-box');
 
-            if(staff.isWinner) {
-                winBox.innerHTML += `<div style="padding:10px; border-bottom:1px solid #222"><b style="color:var(--tech-gold)">${staff.name}</b><br><small>${staff.prize}</small></div>`;
-            }
-        });
+            rows.forEach((row, i) => {
+                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                if(cols.length < 4) return;
+                
+                const staff = {
+                    id: `staff-${i}`,
+                    name: cols[1].replace(/"/g, '').trim(),
+                    quote: cols[2].replace(/"/g, ''),
+                    photo: cols[3].trim(),
+                    years: parseInt(cols[4]) || 1,
+                    isWinner: cols[5]?.toLowerCase().includes('yes'),
+                    prize: cols[6] || "Gift"
+                };
+                staffData.push(staff);
+                createAvatar(staff, i);
 
-        staffData.sort((a,b) => a.name.localeCompare(b.name)).forEach(s => {
-            const link = document.createElement('div');
-            link.className = 'staff-link';
-            link.innerText = s.name;
-            link.onclick = () => { focusStaff(s.id); toggleDropdown(); };
-            dropdown.appendChild(link);
-        });
+                if(staff.isWinner) {
+                    winBox.innerHTML += `<div style="padding:10px; border-bottom:1px solid #222"><b style="color:var(--tech-gold)">${staff.name}</b><br><small>${staff.prize}</small></div>`;
+                }
+            });
+
+            staffData.sort((a,b) => a.name.localeCompare(b.name)).forEach(s => {
+                const link = document.createElement('div');
+                link.className = 'staff-link';
+                link.innerText = s.name;
+                link.onclick = () => { focusStaff(s.id); toggleDropdown(); };
+                dropdown.appendChild(link);
+            });
+        } catch (e) { console.error("Error loading CSV:", e); }
     }
 
     function createAvatar(staff, index) {
         const char = document.createElement('div');
         char.className = 'character';
         char.id = staff.id;
-        const radius = window.innerWidth < 600 ? 120 + (Math.random() * 80) : 220 + (Math.random() * 300);
-        const duration = 40 + (Math.random() * 40);
-        
-        const style = document.createElement("style");
-        style.innerText = `@keyframes orbit${index} { 
-            from { transform: rotate(0deg) translateX(${radius}px) rotate(0deg); } 
-            to { transform: rotate(360deg) translateX(${radius}px) rotate(-360deg); } 
-        }`;
-        document.head.appendChild(style);
-        char.style.animation = `orbit${index} ${duration}s linear infinite`;
+        applyOrbit(char, index);
 
         let id = staff.photo.includes('id=') ? staff.photo.split('id=')[1].split('&')[0] : 
                  staff.photo.includes('/d/') ? staff.photo.split('/d/')[1].split('/')[0] : "";
@@ -225,6 +224,31 @@
         char.innerHTML = `${ringsHtml}<div class="face ${staff.isWinner ? 'winner-glow' : ''}" style="background-image: url('${img}')"></div>`;
         char.onclick = (e) => showHero(staff, char, e);
         document.getElementById('stage').appendChild(char);
+    }
+
+    function applyOrbit(element, index) {
+        const isBackground = Math.random() > 0.5;
+        const radius = isBackground ? 380 + (Math.random() * 450) : 160 + (Math.random() * 220);
+        const duration = 35 + (Math.random() * 65);
+        const depth = isBackground ? -250 : 0;
+        
+        element.style.opacity = isBackground ? "0.35" : "1";
+        element.style.filter = isBackground ? "blur(1.5px)" : "none";
+        
+        const animName = `orbit${index}_${Math.floor(Math.random()*10000)}`;
+        const style = document.createElement("style");
+        style.innerText = `@keyframes ${animName} { 
+            from { transform: translate3d(0,0,${depth}px) rotate(0deg) translateX(${radius}px) rotate(0deg); } 
+            to { transform: translate3d(0,0,${depth}px) rotate(360deg) translateX(${radius}px) rotate(-360deg); } 
+        }`;
+        document.head.appendChild(style);
+        element.style.animation = `${animName} ${duration}s linear infinite`;
+    }
+
+    function shuffleOrbits() {
+        document.querySelectorAll('.character').forEach((char, i) => {
+            if(!char.classList.contains('hero')) applyOrbit(char, i);
+        });
     }
 
     function toggleDropdown() {
@@ -256,6 +280,7 @@
     }
 
     function toggleRaffle(show) { document.getElementById('raffle-panel').style.display = show ? 'block' : 'none'; }
+    
     function closeHero() { 
         document.querySelectorAll('.character').forEach(c => c.classList.remove('hero')); 
         document.getElementById('profile-card').style.display = 'none'; 

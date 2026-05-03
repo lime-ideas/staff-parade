@@ -344,12 +344,28 @@
     function fallbackFace() {
       return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="white"/><circle cx="100" cy="100" r="78" fill="#fde68a"/><circle cx="75" cy="85" r="10" fill="#111827"/><circle cx="125" cy="85" r="10" fill="#111827"/><path d="M65 120 Q100 150 135 120" stroke="#111827" stroke-width="9" fill="none" stroke-linecap="round"/></svg>');
     }
-    function driveImage(url) {
+    function getDriveId(url) {
       if (!url) return '';
       const text = String(url).trim();
-      const idMatch = text.match(/[?&]id=([^&]+)/) || text.match(/\/d\/([^/]+)/);
-      if (idMatch && idMatch[1]) return 'https://drive.google.com/thumbnail?id=' + idMatch[1] + '&sz=w500';
-      return text;
+      const idMatch = text.match(/[?&]id=([^&]+)/) || text.match(/\/d\/([^/]+)/) || text.match(/open\?id=([^&]+)/);
+      return idMatch && idMatch[1] ? idMatch[1] : '';
+    }
+
+    function driveImage(url) {
+      const fileId = getDriveId(url);
+      if (fileId) return 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w700';
+      return url || '';
+    }
+
+    function driveImageAlternates(url) {
+      const fileId = getDriveId(url);
+      if (!fileId) return [];
+      return [
+        'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w700',
+        'https://lh3.googleusercontent.com/d/' + fileId + '=w700',
+        'https://drive.google.com/uc?export=view&id=' + fileId,
+        'https://drive.google.com/uc?id=' + fileId
+      ];
     }
 
     function makeCharacter(data) {
@@ -357,6 +373,7 @@
       const quote = data.quote || 'Happy Staff Appreciation Week!';
       const would = data.wouldYouRather || '';
       const isWinner = String(data.raffleWinner || '').trim().toLowerCase() === 'yes';
+      const originalPhotoUrl = data.originalSrc || data.src || '';
       const el = document.createElement('div');
       el.className = isWinner ? 'character is-winner' : 'character';
       el.dataset.mode = 'quote';
@@ -368,8 +385,19 @@
         '<div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div>';
 
       const img = el.querySelector('img');
+      img.dataset.tryIndex = '0';
+      img.dataset.alts = JSON.stringify(driveImageAlternates(originalPhotoUrl));
       img.src = data.src || fallbackFace();
-      img.onerror = function() { img.src = fallbackFace(); };
+      img.onerror = function() {
+        const alts = JSON.parse(img.dataset.alts || '[]');
+        const next = Number(img.dataset.tryIndex || '0');
+        if (next < alts.length) {
+          img.dataset.tryIndex = String(next + 1);
+          img.src = alts[next];
+        } else {
+          img.src = fallbackFace();
+        }
+      }; 
 
       el.addEventListener('click', function(event) {
         event.stopPropagation();
@@ -457,6 +485,7 @@
             quote: quoteIndex >= 0 ? row[quoteIndex] : '',
             wouldYouRather: wouldIndex >= 0 ? row[wouldIndex] : '',
             src: imageIndex >= 0 ? driveImage(row[imageIndex]) : fallbackFace(),
+            originalSrc: imageIndex >= 0 ? row[imageIndex] : '',
             raffleWinner: raffleValue
           });
         });

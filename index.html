@@ -332,7 +332,7 @@
     const photoInput = document.getElementById('photoInput');
     const addWinnerBtn = document.getElementById('addWinnerBtn');
     const clearBtn = document.getElementById('clearBtn');
-    const winnersList = document.getElementById('winnersList');
+    const winnersList = null;
     const winnerModal = document.getElementById('winnerModal');
     const winnerNameBig = document.getElementById('winnerNameBig');
     const winnerPrizeBig = document.getElementById('winnerPrizeBig');
@@ -555,11 +555,13 @@
     }
 
     function renderWinners() {
-      const text = winners.length ? winners.map(function(w) { return w.name + ' — ' + w.prize; }).join('  •  ') : 'None yet';
-      winnersList.textContent = text;
-      winnersListBig.innerHTML = winners.length
-        ? winners.map(function(w) { return '<div class="winner-row">🎉 <strong>' + escapeHtml(w.name) + '</strong><br><span>' + escapeHtml(w.prize) + '</span></div>'; }).join('')
-        : 'No winners yet';
+      const html = winners.length
+        ? winners.map(function(w) {
+            return '<div class="winner-row">🎉 <strong>' + escapeHtml(w.name) + '</strong><br><span>' + escapeHtml(w.prize) + '</span></div>';
+          }).join('')
+        : '<div class="winner-row">No winners yet</div>';
+
+      if (winnersListBig) winnersListBig.innerHTML = html;
     }).join('  •  ') : 'None yet';
     }
     function addWinner() {
@@ -639,7 +641,9 @@
     });
 
     renderWinners();
-    loadSheetCSV(DEFAULT
+    loadSheetCSV(DEFAULT_CSV);
+    setTimeout(function() { launchConfetti(3); }, 500);
+    animate();
   </script>
 </body>
 </html>

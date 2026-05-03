@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STI Staff Excellence - Auto-Reorbit</title>
+    <title>STI Staff Excellence - Logo Fix</title>
     <style>
         :root {
             --school-red: #b31b1b;
@@ -56,8 +56,22 @@
         .staff-link:hover { background: var(--tech-gold); color: black; }
 
         /* STAGE & AVATARS */
-        #stage { width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; z-index: 1; }
-        #logo-hub { width: 120px; height: 120px; z-index: 100; pointer-events: none; }
+        #stage { 
+            width: 100vw; height: 100vh; 
+            display: flex; justify-content: center; align-items: center; 
+            position: relative; z-index: 5; /* Increased z-index */
+        }
+
+        /* FIXED LOGO HUB FOR MOBILE */
+        #logo-hub { 
+            width: 120px; height: 120px; 
+            z-index: 100; pointer-events: none;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #logo-hub img {
+            width: 100%; height: auto;
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
+        }
         
         .character { 
             position: absolute; display: flex; flex-direction: column; align-items: center; 
@@ -103,6 +117,7 @@
         }
 
         @media (max-width: 600px) {
+            #logo-hub { width: 100px; height: 100px; }
             .character.hero { transform: translate(0, 0) scale(2.2) !important; }
         }
     </style>
@@ -124,8 +139,9 @@
 </div>
 
 <div id="stage">
+    <!-- Ensure Logo Hub has an image nested inside -->
     <div id="logo-hub">
-        <img src="Lime_Street_Elementary_School_logo_template_300.png" style="width:100%">
+        <img src="Lime_Street_Elementary_School_logo_template_300.png" alt="STI LOGO">
     </div>
 </div>
 
@@ -184,7 +200,7 @@
         const char = document.createElement('div');
         char.className = 'character';
         char.id = staff.id;
-        const radius = window.innerWidth < 600 ? 120 + (Math.random() * 100) : 220 + (Math.random() * 300);
+        const radius = window.innerWidth < 600 ? 120 + (Math.random() * 80) : 220 + (Math.random() * 300);
         const duration = 40 + (Math.random() * 40);
         
         const style = document.createElement("style");
@@ -199,7 +215,6 @@
                  staff.photo.includes('/d/') ? staff.photo.split('/d/')[1].split('/')[0] : "";
         const img = id ? `https://lh3.googleusercontent.com/u/0/d/${id}` : staff.photo;
 
-        // ADD RADIATING SERVICE RINGS
         let ringsHtml = '';
         const ringCount = Math.min(staff.years, 5);
         for(let r=1; r<=ringCount; r++) {
@@ -226,12 +241,9 @@
 
     function showHero(staff, element, e) {
         if(e) e.stopPropagation();
-        
-        clearTimeout(autoCloseTimer); // Reset timer if someone else is clicked
-        
+        clearTimeout(autoCloseTimer);
         document.querySelectorAll('.character').forEach(c => c.classList.remove('hero'));
         element.classList.add('hero');
-
         const card = document.getElementById('profile-card');
         card.innerHTML = `
             <h3 style="margin:0; color:var(--tech-gold)">${staff.name}</h3>
@@ -240,15 +252,10 @@
             <div style="font-size: 8px; color: #444; margin-top: 10px; text-transform: uppercase;">Closing in 10s...</div>
         `;
         card.style.display = 'block';
-
-        // START 10 SECOND AUTO-CLOSE
-        autoCloseTimer = setTimeout(() => {
-            closeHero();
-        }, 10000);
+        autoCloseTimer = setTimeout(() => { closeHero(); }, 10000);
     }
 
     function toggleRaffle(show) { document.getElementById('raffle-panel').style.display = show ? 'block' : 'none'; }
-    
     function closeHero() { 
         document.querySelectorAll('.character').forEach(c => c.classList.remove('hero')); 
         document.getElementById('profile-card').style.display = 'none'; 

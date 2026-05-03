@@ -270,8 +270,19 @@
     function driveImage(url) {
       if (!url) return '';
       const text = String(url).trim();
+
+      // Handles links like:
+      // https://drive.google.com/open?id=FILE_ID
+      // https://drive.google.com/file/d/FILE_ID/view
+      // https://drive.google.com/uc?id=FILE_ID
       const idMatch = text.match(/[?&]id=([^&]+)/) || text.match(/\/d\/([^/]+)/);
-      if (idMatch && idMatch[1]) return 'https://drive.google.com/uc?export=view&id=' + idMatch[1];
+
+      if (idMatch && idMatch[1]) {
+        const fileId = idMatch[1];
+        // Thumbnail endpoint works better for Google Form image uploads than uc?export=view
+        return 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w400';
+      }
+
       return text;
     }
     function fallbackFace() {

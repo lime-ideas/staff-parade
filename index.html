@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 Lime Street</title>
+    <title>2026 Lime Street - Layer Fix</title>
     <style>
         :root {
             --school-red: #b31b1b;
@@ -23,7 +23,7 @@
 
         #canvas-bg { position: absolute; top: 0; left: 0; z-index: 0; }
 
-        /* HEADER - Standard Desktop */
+        /* HEADER */
         #header-banner {
             position: fixed; top: 15px; right: 20px;
             text-align: right; z-index: 2005; pointer-events: none;
@@ -31,7 +31,7 @@
         #header-banner h1 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: 2px; color: var(--tech-gold); text-transform: uppercase; }
         #header-banner p { margin: 2px 0; font-size: 10px; color: #888; }
 
-        /* MENU CONTROLS - Standard Desktop */
+        /* MENU CONTROLS */
         #command-menu {
             position: fixed; top: 15px; left: 15px;
             width: 220px; z-index: 3000;
@@ -44,7 +44,6 @@
             text-align: left; transition: all 0.2s; backdrop-filter: blur(10px);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .menu-btn:hover { border-color: var(--tech-gold); color: var(--tech-gold); }
 
         #staff-dropdown {
             max-height: 0; overflow: hidden; background: rgba(15, 15, 15, 0.95);
@@ -53,9 +52,8 @@
         }
         #staff-dropdown.open { max-height: 350px; overflow-y: auto; border: 1px solid var(--ui-border); }
         .staff-link { padding: 10px 15px; font-size: 12px; color: #ccc; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .staff-link:hover { background: var(--tech-gold); color: black; }
 
-        /* STAGE & PERSPECTIVE */
+        /* STAGE */
         #stage { 
             width: 100vw; height: 100vh; 
             display: flex; justify-content: center; align-items: center; 
@@ -63,22 +61,30 @@
             perspective: 1200px;
         }
 
+        /* LOGO HUB - Set lower than Hero */
         #logo-hub { 
             width: 120px; height: 120px; 
             z-index: 100; cursor: pointer;
             display: flex; justify-content: center; align-items: center;
         }
-        #logo-hub img {
-            width: 100%; height: auto;
-            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
-        }
+        #logo-hub img { width: 100%; height: auto; filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4)); }
         
         .character { 
             position: absolute; display: flex; flex-direction: column; align-items: center; 
-            cursor: pointer; z-index: 10; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            cursor: pointer; z-index: 10; transition: opacity 1s, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
         .face { width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; background-size: cover; background-position: center; position: relative; z-index: 5; }
         
+        /* HERO STATE - Force to top of all layers */
+        .character.hero {
+            animation: none !important; 
+            transform: translate3d(0, 0, 400px) scale(3) !important;
+            top: 50% !important; left: 50% !important; 
+            margin-top: -25px; margin-left: -25px; 
+            z-index: 10000 !important; /* Higher than logo and menu */
+            opacity: 1 !important; filter: none !important;
+        }
+
         .service-ring {
             position: absolute; border-radius: 50%; border: 1px solid var(--tech-gold);
             opacity: 0; pointer-events: none; transition: all 0.6s ease;
@@ -89,49 +95,23 @@
         .winner-glow { border: 3px solid var(--tech-gold) !important; animation: win-pulse 3s infinite ease-in-out; }
         @keyframes win-pulse { 0%, 100% { box-shadow: 0 0 10px var(--tech-gold); } 50% { box-shadow: 0 0 30px var(--tech-gold); } }
 
-        .character.hero {
-            animation: none !important; transform: translate3d(0, 0, 300px) scale(2.8) !important;
-            top: 50% !important; left: 50% !important; margin-top: -25px; margin-left: -25px; z-index: 9999;
-        }
-
         #profile-card { 
             position: fixed; bottom: 20px; left: 20px; width: calc(100% - 40px); max-width: 300px;
             background: rgba(15,15,15,0.95); border: 1px solid var(--tech-gold); 
-            padding: 20px; border-radius: 8px; display: none; z-index: 4000; backdrop-filter: blur(15px);
-        }
-        #raffle-panel {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; max-width: 350px; background: rgba(10, 10, 10, 0.98);
-            border: 1px solid var(--tech-gold); border-radius: 12px;
-            padding: 25px; z-index: 5000; display: none; backdrop-filter: blur(20px);
+            padding: 20px; border-radius: 8px; display: none; z-index: 11000; backdrop-filter: blur(15px);
         }
 
-        /* MOBILE FIX: PREVENT OVERLAP */
         @media (max-width: 600px) {
-            #header-banner {
-                top: 10px; right: 0; left: 0;
-                text-align: center;
-                width: 100%;
-            }
+            #header-banner { top: 10px; right: 0; left: 0; text-align: center; width: 100%; }
             #header-banner h1 { font-size: 14px; }
-            #header-banner p { font-size: 8px; }
-
-            #command-menu {
-                top: 60px; /* Pushed down to clear the header */
-                left: 50%;
-                transform: translateX(-50%);
-                width: 90%;
-            }
-            .menu-btn { padding: 10px; font-size: 10px; }
-
+            #command-menu { top: 60px; left: 50%; transform: translateX(-50%); width: 90%; }
             #logo-hub { width: 90px; height: 90px; }
-            .character.hero { transform: translate3d(0, 0, 150px) scale(2.2) !important; }
+            /* Mobile Hero Adjustment */
+            .character.hero { transform: translate3d(0, 0, 200px) scale(2.5) !important; }
         }
     </style>
 </head>
 <body>
-
-<canvas id="canvas-bg"></canvas>
 
 <div id="header-banner">
     <h1>STAFF APPRECIATION 2026</h1>
@@ -151,12 +131,6 @@
     </div>
 </div>
 
-<div id="raffle-panel">
-    <h2 style="margin-top:0; color:var(--tech-gold); border-bottom:1px solid #333; padding-bottom:10px">Winners</h2>
-    <div id="winner-list-box" style="max-height: 250px; overflow-y: auto;"></div>
-    <button onclick="toggleRaffle(false)" style="width:100%; margin-top:20px; background:none; border:1px solid #444; color:white; padding:12px; border-radius:6px; cursor:pointer">CLOSE</button>
-</div>
-
 <div id="profile-card"></div>
 
 <script>
@@ -169,29 +143,21 @@
             const response = await fetch(csvUrl);
             const data = await response.text();
             const rows = data.split('\n').slice(1);
-            
             const dropdown = document.getElementById('staff-dropdown');
-            const winBox = document.getElementById('winner-list-box');
 
             rows.forEach((row, i) => {
                 const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 if(cols.length < 4) return;
-                
                 const staff = {
                     id: `staff-${i}`,
                     name: cols[1].replace(/"/g, '').trim(),
                     quote: cols[2].replace(/"/g, ''),
                     photo: cols[3].trim(),
                     years: parseInt(cols[4]) || 1,
-                    isWinner: cols[5]?.toLowerCase().includes('yes'),
-                    prize: cols[6] || "Gift"
+                    isWinner: cols[5]?.toLowerCase().includes('yes')
                 };
                 staffData.push(staff);
                 createAvatar(staff, i);
-
-                if(staff.isWinner) {
-                    winBox.innerHTML += `<div style="padding:10px; border-bottom:1px solid #222"><b style="color:var(--tech-gold)">${staff.name}</b><br><small>${staff.prize}</small></div>`;
-                }
             });
 
             staffData.sort((a,b) => a.name.localeCompare(b.name)).forEach(s => {
@@ -201,7 +167,7 @@
                 link.onclick = () => { focusStaff(s.id); toggleDropdown(); };
                 dropdown.appendChild(link);
             });
-        } catch (e) { console.error("Error loading CSV:", e); }
+        } catch (e) { console.error(e); }
     }
 
     function createAvatar(staff, index) {
@@ -215,8 +181,7 @@
         const img = id ? `https://lh3.googleusercontent.com/u/0/d/${id}` : staff.photo;
 
         let ringsHtml = '';
-        const ringCount = Math.min(staff.years, 5);
-        for(let r=1; r<=ringCount; r++) {
+        for(let r=1; r<=Math.min(staff.years, 5); r++) {
             const size = 50 + (r * 15);
             ringsHtml += `<div class="service-ring" style="width:${size}px; height:${size}px; top:calc(50% - ${size/2}px); left:calc(50% - ${size/2}px); animation-delay:${r*0.3}s"></div>`;
         }
@@ -231,10 +196,8 @@
         const radius = isBackground ? 380 + (Math.random() * 450) : 160 + (Math.random() * 220);
         const duration = 35 + (Math.random() * 65);
         const depth = isBackground ? -250 : 0;
-        
         element.style.opacity = isBackground ? "0.35" : "1";
         element.style.filter = isBackground ? "blur(1.5px)" : "none";
-        
         const animName = `orbit${index}_${Math.floor(Math.random()*10000)}`;
         const style = document.createElement("style");
         style.innerText = `@keyframes ${animName} { 
@@ -251,17 +214,8 @@
         });
     }
 
-    function toggleDropdown() {
-        const d = document.getElementById('staff-dropdown');
-        const arrow = document.getElementById('drop-arrow');
-        d.classList.toggle('open');
-        arrow.innerText = d.classList.contains('open') ? '▲' : '▼';
-    }
-
-    function focusStaff(id) {
-        const char = document.getElementById(id);
-        if(char) char.click();
-    }
+    function toggleDropdown() { document.getElementById('staff-dropdown').classList.toggle('open'); }
+    function focusStaff(id) { const char = document.getElementById(id); if(char) char.click(); }
 
     function showHero(staff, element, e) {
         if(e) e.stopPropagation();
@@ -273,23 +227,18 @@
             <h3 style="margin:0; color:var(--tech-gold)">${staff.name}</h3>
             <p style="font-size:10px; color:#555; margin-bottom:10px">${staff.years} Years of Service</p>
             <p style="font-style:italic; font-size:13px">"${staff.quote}"</p>
-            <div style="font-size: 8px; color: #444; margin-top: 10px; text-transform: uppercase;">Closing in 10s...</div>
         `;
         card.style.display = 'block';
         autoCloseTimer = setTimeout(() => { closeHero(); }, 10000);
     }
 
-    function toggleRaffle(show) { document.getElementById('raffle-panel').style.display = show ? 'block' : 'none'; }
-    
     function closeHero() { 
         document.querySelectorAll('.character').forEach(c => c.classList.remove('hero')); 
         document.getElementById('profile-card').style.display = 'none'; 
     }
     
     document.addEventListener('click', (e) => {
-        if(!e.target.closest('.character') && !e.target.closest('#profile-card') && !e.target.closest('#command-menu')) {
-            closeHero();
-        }
+        if(!e.target.closest('.character') && !e.target.closest('#profile-card')) closeHero();
     });
 
     init();

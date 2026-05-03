@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 Lime Street - Layer Fix</title>
+    <title>2026 Lime Street - Fixed Dropdown</title>
     <style>
         :root {
             --school-red: #b31b1b;
@@ -34,24 +34,26 @@
         /* MENU CONTROLS */
         #command-menu {
             position: fixed; top: 15px; left: 15px;
-            width: 220px; z-index: 3000;
+            width: 220px; z-index: 5000; /* High priority */
             display: flex; flex-direction: column; gap: 10px;
         }
         .menu-btn {
-            background: rgba(20, 20, 20, 0.8); border: 1px solid var(--ui-border);
+            background: rgba(20, 20, 20, 0.85); border: 1px solid var(--ui-border);
             color: white; padding: 12px; border-radius: 6px;
             cursor: pointer; font-size: 11px; font-weight: bold;
             text-align: left; transition: all 0.2s; backdrop-filter: blur(10px);
             display: flex; justify-content: space-between; align-items: center;
         }
+        .menu-btn:hover { border-color: var(--tech-gold); }
 
         #staff-dropdown {
-            max-height: 0; overflow: hidden; background: rgba(15, 15, 15, 0.95);
-            border-radius: 6px; transition: max-height 0.4s ease;
-            display: flex; flex-direction: column;
+            max-height: 0; overflow: hidden; background: rgba(15, 15, 15, 0.98);
+            border-radius: 6px; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; z-index: 5001;
         }
         #staff-dropdown.open { max-height: 350px; overflow-y: auto; border: 1px solid var(--ui-border); }
-        .staff-link { padding: 10px 15px; font-size: 12px; color: #ccc; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .staff-link { padding: 12px 15px; font-size: 12px; color: #ccc; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .staff-link:hover { background: var(--tech-gold); color: black; }
 
         /* STAGE */
         #stage { 
@@ -61,7 +63,6 @@
             perspective: 1200px;
         }
 
-        /* LOGO HUB - Set lower than Hero */
         #logo-hub { 
             width: 120px; height: 120px; 
             z-index: 100; cursor: pointer;
@@ -71,18 +72,15 @@
         
         .character { 
             position: absolute; display: flex; flex-direction: column; align-items: center; 
-            cursor: pointer; z-index: 10; transition: opacity 1s, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            cursor: pointer; z-index: 10; transition: opacity 1s, transform 0.5s;
         }
         .face { width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; background-size: cover; background-position: center; position: relative; z-index: 5; }
         
-        /* HERO STATE - Force to top of all layers */
+        /* HERO STATE */
         .character.hero {
-            animation: none !important; 
-            transform: translate3d(0, 0, 400px) scale(3) !important;
-            top: 50% !important; left: 50% !important; 
-            margin-top: -25px; margin-left: -25px; 
-            z-index: 10000 !important; /* Higher than logo and menu */
-            opacity: 1 !important; filter: none !important;
+            animation: none !important; transform: translate3d(0, 0, 400px) scale(3) !important;
+            top: 50% !important; left: 50% !important; margin-top: -25px; margin-left: -25px; 
+            z-index: 9000 !important; opacity: 1 !important; filter: none !important;
         }
 
         .service-ring {
@@ -98,15 +96,15 @@
         #profile-card { 
             position: fixed; bottom: 20px; left: 20px; width: calc(100% - 40px); max-width: 300px;
             background: rgba(15,15,15,0.95); border: 1px solid var(--tech-gold); 
-            padding: 20px; border-radius: 8px; display: none; z-index: 11000; backdrop-filter: blur(15px);
+            padding: 20px; border-radius: 8px; display: none; z-index: 10000; backdrop-filter: blur(15px);
         }
 
+        /* MOBILE FIX */
         @media (max-width: 600px) {
             #header-banner { top: 10px; right: 0; left: 0; text-align: center; width: 100%; }
             #header-banner h1 { font-size: 14px; }
             #command-menu { top: 60px; left: 50%; transform: translateX(-50%); width: 90%; }
             #logo-hub { width: 90px; height: 90px; }
-            /* Mobile Hero Adjustment */
             .character.hero { transform: translate3d(0, 0, 200px) scale(2.5) !important; }
         }
     </style>
@@ -121,6 +119,7 @@
 <div id="command-menu">
     <button class="menu-btn" onclick="location.reload()" style="border-color: var(--tech-gold)">🔄 SYNC LIVE DATA</button>
     <button class="menu-btn" onclick="toggleRaffle(true)">🏆 RAFFLE WINNERS <span>›</span></button>
+    <!-- ADDED THE ID "drop-arrow" BACK IN HERE -->
     <button class="menu-btn" onclick="toggleDropdown()">👥 STAFF LIST <span id="drop-arrow">▼</span></button>
     <div id="staff-dropdown"></div>
 </div>
@@ -164,7 +163,11 @@
                 const link = document.createElement('div');
                 link.className = 'staff-link';
                 link.innerText = s.name;
-                link.onclick = () => { focusStaff(s.id); toggleDropdown(); };
+                link.onclick = (e) => { 
+                    e.stopPropagation();
+                    focusStaff(s.id); 
+                    toggleDropdown(); 
+                };
                 dropdown.appendChild(link);
             });
         } catch (e) { console.error(e); }
@@ -214,8 +217,20 @@
         });
     }
 
-    function toggleDropdown() { document.getElementById('staff-dropdown').classList.toggle('open'); }
-    function focusStaff(id) { const char = document.getElementById(id); if(char) char.click(); }
+    function toggleDropdown() {
+        const d = document.getElementById('staff-dropdown');
+        const arrow = document.getElementById('drop-arrow');
+        d.classList.toggle('open');
+        if(arrow) arrow.innerText = d.classList.contains('open') ? '▲' : '▼';
+    }
+
+    function focusStaff(id) {
+        const char = document.getElementById(id);
+        if(char) {
+            const staff = staffData.find(s => s.id === id);
+            showHero(staff, char);
+        }
+    }
 
     function showHero(staff, element, e) {
         if(e) e.stopPropagation();
@@ -229,7 +244,7 @@
             <p style="font-style:italic; font-size:13px">"${staff.quote}"</p>
         `;
         card.style.display = 'block';
-        autoCloseTimer = setTimeout(() => { closeHero(); }, 10000);
+        autoCloseTimer = setTimeout(() => { closeHero(); }, 15000);
     }
 
     function closeHero() { 
@@ -238,7 +253,11 @@
     }
     
     document.addEventListener('click', (e) => {
-        if(!e.target.closest('.character') && !e.target.closest('#profile-card')) closeHero();
+        if(!e.target.closest('.character') && !e.target.closest('#profile-card') && !e.target.closest('#command-menu')) {
+            closeHero();
+            const d = document.getElementById('staff-dropdown');
+            if(d.classList.contains('open')) toggleDropdown();
+        }
     });
 
     init();

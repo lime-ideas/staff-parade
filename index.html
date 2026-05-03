@@ -51,7 +51,7 @@
       font-weight: 900;
       cursor: pointer;
       box-shadow: 0 5px 0 #0369a1;
-      font-size: 13px;
+      font-size: 12px;
     }
     .btn:active, label.upload-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #0369a1; }
     .btn.purple { background: #8b5cf6; box-shadow: 0 5px 0 #5b21b6; }
@@ -68,13 +68,14 @@
       z-index: 30;
       background: rgba(255,255,255,.94);
       border: 4px solid #111827;
-      border-radius: 20px;
-      padding: 10px 16px;
+      border-radius: 999px;
+      padding: 10px 18px;
       box-shadow: 0 10px 25px rgba(0,0,0,.2);
       max-width: 92vw;
       text-align: center;
       font-size: clamp(14px, 2vw, 20px);
-      font-weight: 900;
+      font-weight: 1000;
+      cursor: pointer;
     }
 
     .celebrate-refresh {
@@ -166,28 +167,28 @@
 
     .winner-chain {
       position: absolute;
-      top: 56px;
+      top: 140px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 9;
-      width: 118px;
+      width: 120px;
       pointer-events: none;
       display: none;
       filter: drop-shadow(0 6px 8px rgba(0,0,0,.35));
     }
     .is-winner .winner-chain { display: block; }
     .chain-loop {
-      width: 88px;
-      height: 48px;
-      margin: 0 auto -9px;
+      width: 82px;
+      height: 34px;
+      margin: 0 auto -7px;
       border: 8px dashed #fbbf24;
       border-bottom: 0;
       border-radius: 60px 60px 0 0;
       background: transparent;
     }
     .chain-medal {
-      width: 112px;
-      height: 62px;
+      width: 108px;
+      height: 54px;
       margin: 0 auto;
       border-radius: 18px;
       background: linear-gradient(135deg, #fff7ad, #f59e0b 45%, #fef3c7 75%, #b45309);
@@ -264,6 +265,10 @@
     .winner-card h2 { margin: 0 0 10px; font-size: clamp(30px, 7vw, 72px); color: #ec4899; }
     .winner-name-big { font-size: clamp(44px, 10vw, 104px); font-weight: 1000; color: #0ea5e9; text-shadow: 4px 4px #fde047; }
     .winner-prize-big { margin-top: 12px; font-size: clamp(22px, 4vw, 42px); font-weight: 900; }
+    .winners-list-card { max-height: 88vh; overflow-y: auto; }
+    .winners-list-big { margin-top: 16px; display: grid; gap: 12px; font-size: clamp(20px, 4vw, 36px); }
+    .winner-row { padding: 14px; border: 4px solid #111827; border-radius: 22px; background: #fef3c7; box-shadow: 0 6px 0 #fbbf24; }
+    .winner-row span { color: #ec4899; font-weight: 1000; }
     .confetti { position: fixed; top: -20px; width: 12px; height: 18px; opacity: .9; z-index: 110; animation: fall 2.5s linear forwards; }
     @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
 
@@ -299,7 +304,7 @@
     <span>tap to refresh the page</span>
   </button>
 
-  <div class="winners-bar">🏆 Raffle Winners: <span id="winnersList">None yet</span></div>
+  <button class="winners-bar" id="showWinnersBtn">🏆 Raffle Winners</button>
   <div class="footer-note">Tap a selfie to reveal their message 👀</div>
 
   <div class="winner-modal" id="winnerModal">
@@ -308,6 +313,14 @@
       <div class="winner-name-big" id="winnerNameBig">Name</div>
       <div class="winner-prize-big" id="winnerPrizeBig">Prize</div>
       <button class="btn pink" id="closeWinnerBtn" style="margin-top:22px;">Close</button>
+    </div>
+  </div>
+
+  <div class="winner-modal" id="winnersListModal">
+    <div class="winner-card winners-list-card">
+      <h2>🏆 Raffle Winners</h2>
+      <div id="winnersListBig" class="winners-list-big">No winners yet</div>
+      <button class="btn pink" id="closeWinnersListBtn" style="margin-top:22px;">Back to Parade</button>
     </div>
   </div>
 
@@ -324,6 +337,10 @@
     const winnerNameBig = document.getElementById('winnerNameBig');
     const winnerPrizeBig = document.getElementById('winnerPrizeBig');
     const closeWinnerBtn = document.getElementById('closeWinnerBtn');
+    const showWinnersBtn = document.getElementById('showWinnersBtn');
+    const winnersListModal = document.getElementById('winnersListModal');
+    const winnersListBig = document.getElementById('winnersListBig');
+    const closeWinnersListBtn = document.getElementById('closeWinnersListBtn');
 
     const DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwz4lMDeYja7-Vluu-B8-StkdVcoMMQSS2-nYsrQxtOSm4SK-IwmJhSpvUlqK5TqrkHZKIVEz_RihC/pub?output=csv';
     const MAX_PEOPLE = 60;
@@ -538,7 +555,12 @@
     }
 
     function renderWinners() {
-      winnersList.textContent = winners.length ? winners.map(function(w) { return w.name + ' — ' + w.prize; }).join('  •  ') : 'None yet';
+      const text = winners.length ? winners.map(function(w) { return w.name + ' — ' + w.prize; }).join('  •  ') : 'None yet';
+      winnersList.textContent = text;
+      winnersListBig.innerHTML = winners.length
+        ? winners.map(function(w) { return '<div class="winner-row">🎉 <strong>' + escapeHtml(w.name) + '</strong><br><span>' + escapeHtml(w.prize) + '</span></div>'; }).join('')
+        : 'No winners yet';
+    }).join('  •  ') : 'None yet';
     }
     function addWinner() {
       const name = prompt('Winner name:', 'Cafeteria Lady');
@@ -551,17 +573,23 @@
       winnerModal.style.display = 'flex';
       launchConfetti();
     }
-    function launchConfetti() {
+    function launchConfetti(duration) {
       const colors = ['#f43f5e', '#0ea5e9', '#22c55e', '#fde047', '#a855f7', '#f97316'];
-      for (let i = 0; i < 90; i++) {
-        const piece = document.createElement('div');
-        piece.className = 'confetti';
-        piece.style.left = random(0, 100) + 'vw';
-        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.animationDelay = random(0, .7) + 's';
-        document.body.appendChild(piece);
-        setTimeout(function() { piece.remove(); }, 3200);
-      }
+      const totalBursts = duration || 1;
+      let burst = 0;
+      const timer = setInterval(function() {
+        for (let i = 0; i < 70; i++) {
+          const piece = document.createElement('div');
+          piece.className = 'confetti';
+          piece.style.left = random(0, 100) + 'vw';
+          piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+          piece.style.animationDelay = random(0, .4) + 's';
+          document.body.appendChild(piece);
+          setTimeout(function() { piece.remove(); }, 4600);
+        }
+        burst++;
+        if (burst >= totalBursts) clearInterval(timer);
+      }, 450);
     }
 
     
@@ -603,14 +631,15 @@
     addWinnerBtn.addEventListener('click', addWinner);
     clearBtn.addEventListener('click', function() { clearAll(); winners = []; renderWinners(); });
     closeWinnerBtn.addEventListener('click', function() { winnerModal.style.display = 'none'; });
+    showWinnersBtn.addEventListener('click', function() { renderWinners(); winnersListModal.style.display = 'flex'; launchConfetti(2); });
+    closeWinnersListBtn.addEventListener('click', function() { winnersListModal.style.display = 'none'; });
     document.getElementById('refreshBtn').addEventListener('click', function() {
-      launchConfetti();
-      setTimeout(function() { window.location.reload(); }, 650);
+      launchConfetti(4);
+      setTimeout(function() { window.location.reload(); }, 1600);
     });
 
     renderWinners();
-    loadSheetCSV(DEFAULT_CSV);
-    animate();
+    loadSheetCSV(DEFAULT
   </script>
 </body>
 </html>

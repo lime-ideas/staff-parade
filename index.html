@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 Lime Street - Fixed Dropdown</title>
+    <title>2026 Lime Street - Logic Refinement</title>
     <style>
         :root {
             --school-red: #b31b1b;
@@ -21,8 +21,6 @@
             color: white;
         }
 
-        #canvas-bg { position: absolute; top: 0; left: 0; z-index: 0; }
-
         /* HEADER */
         #header-banner {
             position: fixed; top: 15px; right: 20px;
@@ -34,7 +32,7 @@
         /* MENU CONTROLS */
         #command-menu {
             position: fixed; top: 15px; left: 15px;
-            width: 220px; z-index: 5000; /* High priority */
+            width: 220px; z-index: 5000;
             display: flex; flex-direction: column; gap: 10px;
         }
         .menu-btn {
@@ -88,7 +86,6 @@
             opacity: 0; pointer-events: none; transition: all 0.6s ease;
         }
         .hero .service-ring { opacity: 0.6; animation: ring-pulse 3s infinite alternate; }
-        @keyframes ring-pulse { from { transform: scale(1); opacity: 0.3; } to { transform: scale(1.15); opacity: 0.8; border-color: var(--school-red); } }
 
         .winner-glow { border: 3px solid var(--tech-gold) !important; animation: win-pulse 3s infinite ease-in-out; }
         @keyframes win-pulse { 0%, 100% { box-shadow: 0 0 10px var(--tech-gold); } 50% { box-shadow: 0 0 30px var(--tech-gold); } }
@@ -99,10 +96,8 @@
             padding: 20px; border-radius: 8px; display: none; z-index: 10000; backdrop-filter: blur(15px);
         }
 
-        /* MOBILE FIX */
         @media (max-width: 600px) {
             #header-banner { top: 10px; right: 0; left: 0; text-align: center; width: 100%; }
-            #header-banner h1 { font-size: 14px; }
             #command-menu { top: 60px; left: 50%; transform: translateX(-50%); width: 90%; }
             #logo-hub { width: 90px; height: 90px; }
             .character.hero { transform: translate3d(0, 0, 200px) scale(2.5) !important; }
@@ -118,8 +113,7 @@
 
 <div id="command-menu">
     <button class="menu-btn" onclick="location.reload()" style="border-color: var(--tech-gold)">🔄 SYNC LIVE DATA</button>
-    <button class="menu-btn" onclick="toggleRaffle(true)">🏆 RAFFLE WINNERS <span>›</span></button>
-    <!-- ADDED THE ID "drop-arrow" BACK IN HERE -->
+    <button class="menu-btn" onclick="toggleRaffle()">🏆 RAFFLE WINNERS <span>›</span></button>
     <button class="menu-btn" onclick="toggleDropdown()">👥 STAFF LIST <span id="drop-arrow">▼</span></button>
     <div id="staff-dropdown"></div>
 </div>
@@ -136,6 +130,7 @@
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwz4lMDeYja7-Vluu-B8-StkdVcoMMQSS2-nYsrQxtOSm4SK-IwmJhSpvUlqK5TqrkHZKIVEz_RihC/pub?output=csv";
     let staffData = [];
     let autoCloseTimer = null;
+    let showingWinnersOnly = false;
 
     async function init() {
         try {
@@ -163,11 +158,7 @@
                 const link = document.createElement('div');
                 link.className = 'staff-link';
                 link.innerText = s.name;
-                link.onclick = (e) => { 
-                    e.stopPropagation();
-                    focusStaff(s.id); 
-                    toggleDropdown(); 
-                };
+                link.onclick = (e) => { e.stopPropagation(); focusStaff(s.id); toggleDropdown(); };
                 dropdown.appendChild(link);
             });
         } catch (e) { console.error(e); }
@@ -195,12 +186,21 @@
     }
 
     function applyOrbit(element, index) {
-        const isBackground = Math.random() > 0.5;
-        const radius = isBackground ? 380 + (Math.random() * 450) : 160 + (Math.random() * 220);
+        // Blur logic: Only blur if there are > 20 staff members
+        const isCrowded = staffData.length > 20;
+        const isBackground = isCrowded && (Math.random() > 0.6);
+        
+        // Distance logic: Keep them closer if count is low (< 20)
+        const minRad = isCrowded ? 160 : 120;
+        const maxRad = isCrowded ? 400 : 250;
+        const radius = minRad + (Math.random() * (maxRad - minRad));
+        
         const duration = 35 + (Math.random() * 65);
         const depth = isBackground ? -250 : 0;
+        
         element.style.opacity = isBackground ? "0.35" : "1";
         element.style.filter = isBackground ? "blur(1.5px)" : "none";
+        
         const animName = `orbit${index}_${Math.floor(Math.random()*10000)}`;
         const style = document.createElement("style");
         style.innerText = `@keyframes ${animName} { 
@@ -222,6 +222,18 @@
         const arrow = document.getElementById('drop-arrow');
         d.classList.toggle('open');
         if(arrow) arrow.innerText = d.classList.contains('open') ? '▲' : '▼';
+    }
+
+    function toggleRaffle() {
+        showingWinnersOnly = !showingWinnersOnly;
+        staffData.forEach(staff => {
+            const el = document.getElementById(staff.id);
+            if (showingWinnersOnly) {
+                el.style.display = staff.isWinner ? 'flex' : 'none';
+            } else {
+                el.style.display = 'flex';
+            }
+        });
     }
 
     function focusStaff(id) {
@@ -256,7 +268,7 @@
         if(!e.target.closest('.character') && !e.target.closest('#profile-card') && !e.target.closest('#command-menu')) {
             closeHero();
             const d = document.getElementById('staff-dropdown');
-            if(d.classList.contains('open')) toggleDropdown();
+            if(d?.classList.contains('open')) toggleDropdown();
         }
     });
 

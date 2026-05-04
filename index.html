@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 Lime Street - Logic Refinement</title>
+    <title>2026 Lime Street - Raffle Fix</title>
     <style>
         :root {
             --school-red: #b31b1b;
@@ -186,15 +186,11 @@
     }
 
     function applyOrbit(element, index) {
-        // Blur logic: Only blur if there are > 20 staff members
         const isCrowded = staffData.length > 20;
         const isBackground = isCrowded && (Math.random() > 0.6);
-        
-        // Distance logic: Keep them closer if count is low (< 20)
         const minRad = isCrowded ? 160 : 120;
         const maxRad = isCrowded ? 400 : 250;
         const radius = minRad + (Math.random() * (maxRad - minRad));
-        
         const duration = 35 + (Math.random() * 65);
         const depth = isBackground ? -250 : 0;
         
@@ -228,10 +224,12 @@
         showingWinnersOnly = !showingWinnersOnly;
         staffData.forEach(staff => {
             const el = document.getElementById(staff.id);
-            if (showingWinnersOnly) {
-                el.style.display = staff.isWinner ? 'flex' : 'none';
-            } else {
-                el.style.display = 'flex';
+            if (el) {
+                if (showingWinnersOnly) {
+                    el.style.display = staff.isWinner ? 'flex' : 'none';
+                } else {
+                    el.style.display = 'flex';
+                }
             }
         });
     }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 Lime Street - Final Review</title>
+    <title>2026 Lime Street - Stage Director</title>
     <style>
         :root {
             --tech-gold: #d4af37;
@@ -20,7 +20,7 @@
             color: white;
         }
 
-        /* 1. TITLE / HEADER (Top Center for all devices) */
+        /* HEADER */
         #header-banner {
             position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
             text-align: center; z-index: 5001; pointer-events: none; width: 100%;
@@ -28,7 +28,7 @@
         #header-banner h1 { margin: 0; font-size: 18px; font-weight: 800; color: var(--tech-gold); text-transform: uppercase; letter-spacing: 2px; }
         #header-banner p { margin: 2px 0; font-size: 10px; color: #888; }
 
-        /* 2. THREE FUNCTIONING MENU BUTTONS */
+        /* MENU */
         #command-menu {
             position: fixed; top: 15px; left: 15px;
             width: 200px; z-index: 5000;
@@ -56,19 +56,20 @@
             padding: 20px; z-index: 6000; display: none; backdrop-filter: blur(20px);
         }
 
-        /* 3. RADIATING HERO ICON */
+        /* STAGE */
         #stage { width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; perspective: 1500px; }
-        .character { position: absolute; cursor: pointer; z-index: 10; transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .face { width: 60px; height: 60px; border-radius: 50%; border: 2px solid white; background-size: cover; background-position: center; position: relative; z-index: 5; }
         
-        /* Centering Logic */
-        .character.hero {
-            top: 50% !important; left: 50% !important;
-            margin-top: -40px; margin-left: -40px;
-            transform: translate3d(0, 0, 600px) scale(3.5) !important;
-            z-index: 9999 !important; animation: none !important;
+        /* CHARACTER TRANSITIONS */
+        .character { 
+            position: absolute; cursor: pointer; z-index: 10; 
+            transition: opacity 1.5s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0; 
         }
+        .character.active { opacity: 1; }
+        
+        .face { width: 60px; height: 60px; border-radius: 50%; border: 2px solid white; background-size: cover; background-position: center; position: relative; z-index: 5; }
 
+        /* RADIATING RINGS */
         .service-ring {
             position: absolute; border: 1.5px solid var(--tech-gold); border-radius: 50%;
             top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
@@ -81,6 +82,14 @@
             100% { transform: translate(-50%, -50%) scale(2.8); opacity: 0; }
         }
 
+        /* HERO FOCUS */
+        .character.hero {
+            top: 50% !important; left: 50% !important;
+            margin-top: -40px; margin-left: -40px;
+            transform: translate3d(0, 0, 600px) scale(3.5) !important;
+            z-index: 9999 !important; animation: none !important; opacity: 1 !important;
+        }
+
         #profile-card { 
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             width: 85%; max-width: 320px; background: rgba(5,5,5,0.95);
@@ -89,8 +98,6 @@
         }
 
         @media (max-width: 600px) {
-            #header-banner h1 { font-size: 14px; }
-            #command-menu { top: 60px; width: 180px; }
             .character.hero { transform: translate3d(0, 0, 200px) scale(2.5) !important; }
         }
     </style>
@@ -123,18 +130,18 @@
 
 <script>
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwz4lMDeYja7-Vluu-B8-StkdVcoMMQSS2-nYsrQxtOSm4SK-IwmJhSpvUlqK5TqrkHZKIVEz_RihC/pub?output=csv";
-    let staffData = [];
+    let staffAll = [];
+    let onStage = []; // Staff IDs currently displayed
     let autoCloseTimer = null;
+    let rotationTimer = null;
+    const MAX_ON_STAGE = 25;
 
-    // SYNC: Bypasses browser and Google cache
     function syncData() {
-        const timestamp = new Date().getTime();
-        window.location.href = window.location.pathname + "?v=" + timestamp;
+        window.location.href = window.location.pathname + "?v=" + new Date().getTime();
     }
 
     async function init() {
-        const freshUrl = csvUrl + "&t=" + new Date().getTime();
-        const response = await fetch(freshUrl);
+        const response = await fetch(csvUrl + "&t=" + new Date().getTime());
         const data = await response.text();
         const rows = data.split('\n').slice(1);
         const winBox = document.getElementById('winner-list-box');
@@ -152,33 +159,47 @@
                 winner: cols[5]?.toLowerCase().includes('yes'),
                 prize: cols[6] || ""
             };
-            staffData.push(staff);
-            createAvatar(staff, i);
+            staffAll.push(staff);
             if(staff.winner) {
                 winBox.innerHTML += `<div style="padding:5px 0; border-bottom:1px solid #222">${staff.name} - <span style="color:var(--tech-gold)">${staff.prize}</span></div>`;
             }
         });
 
-        staffData.sort((a,b) => a.name.localeCompare(b.name)).forEach(s => {
+        // Fill dropdown
+        staffAll.sort((a,b) => a.name.localeCompare(b.name)).forEach(s => {
             const link = document.createElement('div');
             link.className = 'staff-link';
             link.innerText = s.name;
             link.onclick = (e) => { e.stopPropagation(); focusStaff(s.id); };
             dropdown.appendChild(link);
         });
+
+        // Initial stage load
+        const initialCount = Math.min(staffAll.length, MAX_ON_STAGE);
+        for(let i=0; i<initialCount; i++) {
+            addStaffToStage(staffAll[i].id);
+        }
+
+        // Start Director rotation if we have more than the limit
+        if(staffAll.length > MAX_ON_STAGE) {
+            rotationTimer = setInterval(rotateStaff, 8000);
+        }
     }
 
-    function createAvatar(staff, index) {
+    function addStaffToStage(id) {
+        if(onStage.includes(id)) return;
+        const staff = staffAll.find(s => s.id === id);
         const char = document.createElement('div');
         char.className = 'character';
-        char.id = staff.id;
+        char.id = id;
         
-        const rad = 140 + (Math.random() * 140);
-        const dur = 25 + (Math.random() * 30);
+        const rad = 140 + (Math.random() * 150);
+        const dur = 25 + (Math.random() * 35);
         const style = document.createElement("style");
-        style.innerText = `@keyframes orb${index} { from { transform: rotate(0deg) translateX(${rad}px) rotate(0deg); } to { transform: rotate(360deg) translateX(${rad}px) rotate(-360deg); } }`;
+        style.id = `style-${id}`;
+        style.innerText = `@keyframes orb-${id} { from { transform: rotate(0deg) translateX(${rad}px) rotate(0deg); } to { transform: rotate(360deg) translateX(${rad}px) rotate(-360deg); } }`;
         document.head.appendChild(style);
-        char.style.animation = `orb${index} ${dur}s linear infinite`;
+        char.style.animation = `orb-${id} ${dur}s linear infinite`;
 
         let gId = "";
         if(staff.photo.includes('id=')) gId = staff.photo.split('id=')[1].split('&')[0];
@@ -186,22 +207,61 @@
         const img = gId ? `https://lh3.googleusercontent.com/u/0/d/${gId}` : staff.photo;
 
         let rings = '';
-        for(let r=0; r < Math.min(staff.years, 6); r++) {
+        for(let r=0; r < Math.min(staff.years, 8); r++) {
             rings += `<div class="service-ring" style="animation-delay:${r*0.4}s; width:${60+(r*25)}px; height:${60+(r*25)}px;"></div>`;
         }
 
         char.innerHTML = `${rings}<div class="face" style="background-image: url('${img}')"></div>`;
         char.onclick = (e) => showHero(staff, char, e);
         document.getElementById('stage').appendChild(char);
+        onStage.push(id);
+        
+        // Short delay to trigger fade-in transition
+        setTimeout(() => char.classList.add('active'), 100);
     }
 
-    function toggleDropdown() { document.getElementById('staff-dropdown').classList.toggle('open'); }
-    function toggleRaffle(show) { document.getElementById('raffle-panel').style.display = show ? 'block' : 'none'; }
+    function removeStaffFromStage(id) {
+        const char = document.getElementById(id);
+        if(!char || char.classList.contains('hero')) return false; // Don't remove if currently being viewed
+        
+        char.classList.remove('active');
+        onStage = onStage.filter(sid => sid !== id);
+        
+        setTimeout(() => {
+            char.remove();
+            const style = document.getElementById(`style-${id}`);
+            if(style) style.remove();
+        }, 1500); // Match CSS fade transition
+        return true;
+    }
+
+    function rotateStaff() {
+        const waitingPool = staffAll.filter(s => !onStage.includes(s.id));
+        if(waitingPool.length === 0) return;
+
+        const offIdx = Math.floor(Math.random() * onStage.length);
+        const targetId = onStage[offIdx];
+        
+        if(removeStaffFromStage(targetId)) {
+            const nextIdx = Math.floor(Math.random() * waitingPool.length);
+            addStaffToStage(waitingPool[nextIdx].id);
+        }
+    }
 
     function focusStaff(id) {
-        const char = document.getElementById(id);
-        const staff = staffData.find(s => s.id === id);
-        if(char && staff) { showHero(staff, char); toggleDropdown(); }
+        toggleDropdown();
+        // If not on stage, swap them in immediately
+        if(!onStage.includes(id)) {
+            const offIdx = Math.floor(Math.random() * onStage.length);
+            removeStaffFromStage(onStage[offIdx]);
+            addStaffToStage(id);
+        }
+        
+        setTimeout(() => {
+            const char = document.getElementById(id);
+            const staff = staffAll.find(s => s.id === id);
+            if(char && staff) showHero(staff, char);
+        }, 200);
     }
 
     function showHero(staff, element, e) {
@@ -212,13 +272,16 @@
         const card = document.getElementById('profile-card');
         card.innerHTML = `<h3 style="margin:0; color:var(--tech-gold)">${staff.name}</h3><p style="font-size:11px; color:#888;">${staff.years} Years of Service</p><p style="font-style:italic; font-size:13px; margin-top:8px;">"${staff.quote}"</p>`;
         card.style.display = 'block';
-        autoCloseTimer = setTimeout(closeHero, 9000); // 9 second timer
+        autoCloseTimer = setTimeout(closeHero, 9000);
     }
 
     function closeHero() { 
         document.querySelectorAll('.character').forEach(c => c.classList.remove('hero')); 
         document.getElementById('profile-card').style.display = 'none'; 
     }
+
+    function toggleDropdown() { document.getElementById('staff-dropdown').classList.toggle('open'); }
+    function toggleRaffle(show) { document.getElementById('raffle-panel').style.display = show ? 'block' : 'none'; }
 
     document.addEventListener('click', (e) => { if(!e.target.closest('.character')) closeHero(); });
     init();

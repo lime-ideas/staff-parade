@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 Lime Street - Restored</title>
+    <title>2026 Lime Street - Interactive Focus</title>
     <style>
         :root {
             --school-red: #b31b1b;
@@ -21,15 +21,13 @@
             color: white;
         }
 
-        /* HEADER */
+        /* HEADER & MENU */
         #header-banner {
             position: fixed; top: 10px; right: 20px;
             text-align: right; z-index: 2005; pointer-events: none;
         }
-        #header-banner h1 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: 2px; color: var(--tech-gold); text-transform: uppercase; }
-        #header-banner p { margin: 2px 0; font-size: 10px; color: #888; }
-
-        /* MENU */
+        #header-banner h1 { margin: 0; font-size: 16px; font-weight: 800; color: var(--tech-gold); text-transform: uppercase; }
+        
         #command-menu {
             position: fixed; top: 15px; left: 15px;
             width: 220px; z-index: 5000;
@@ -39,10 +37,8 @@
             background: rgba(20, 20, 20, 0.9); border: 1px solid var(--ui-border);
             color: white; padding: 12px; border-radius: 6px;
             cursor: pointer; font-size: 11px; font-weight: bold;
-            text-align: left; transition: all 0.2s; backdrop-filter: blur(10px);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .menu-btn:hover { border-color: var(--tech-gold); }
 
         #staff-dropdown {
             max-height: 0; overflow: hidden; background: rgba(15, 15, 15, 0.98);
@@ -50,16 +46,7 @@
             display: flex; flex-direction: column;
         }
         #staff-dropdown.open { max-height: 350px; overflow-y: auto; border: 1px solid var(--ui-border); }
-        .staff-link { padding: 12px 15px; font-size: 12px; color: #ccc; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .staff-link:hover { background: var(--tech-gold); color: black; }
-
-        /* RAFFLE POPUP */
-        #raffle-panel {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; max-width: 350px; background: rgba(10, 10, 10, 0.98);
-            border: 1px solid var(--tech-gold); border-radius: 12px;
-            padding: 25px; z-index: 6000; display: none; backdrop-filter: blur(20px);
-        }
+        .staff-link { padding: 12px 15px; font-size: 12px; color: #ccc; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
         /* STAGE */
         #stage { 
@@ -68,57 +55,55 @@
             position: relative; z-index: 5; perspective: 1200px;
         }
 
-        #logo-hub { width: 120px; height: 120px; z-index: 100; cursor: pointer; }
-        #logo-hub img { width: 100%; height: auto; filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4)); }
+        .character { position: absolute; cursor: pointer; z-index: 10; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .face { width: 60px; height: 60px; border-radius: 50%; border: 2px solid white; background-size: cover; background-position: center; position: relative; z-index: 5; }
         
-        .character { position: absolute; cursor: pointer; z-index: 10; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
-        .face { width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; background-size: cover; background-position: center; }
-        .winner-glow { border: 3px solid var(--tech-gold) !important; box-shadow: 0 0 15px var(--tech-gold); }
+        /* RADIATING RINGS */
+        .service-ring {
+            position: absolute; border: 1.5px solid var(--tech-gold); border-radius: 50%;
+            top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            opacity: 0; pointer-events: none;
+        }
+        .hero .service-ring { animation: ring-out 3s infinite; }
+        
+        @keyframes ring-out {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+        }
 
-        /* HERO FOCUS */
+        /* HERO CENTERING */
         .character.hero {
-            transform: translate3d(0, 0, 400px) scale(3) !important;
-            top: 50% !important; left: 50% !important; 
-            margin-top: -25px; margin-left: -25px; 
+            top: 50% !important; left: 50% !important;
+            margin-top: -30px; margin-left: -30px;
+            transform: translate3d(0, 0, 500px) scale(3.5) !important;
             z-index: 9999 !important;
+            animation: none !important;
         }
 
         #profile-card { 
-            position: fixed; bottom: 20px; left: 20px; width: calc(100% - 40px); max-width: 300px;
-            background: rgba(15,15,15,0.95); border: 1px solid var(--tech-gold); 
-            padding: 20px; border-radius: 8px; display: none; z-index: 10000; backdrop-filter: blur(15px);
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 320px; background: rgba(10,10,10,0.95);
+            border: 1px solid var(--tech-gold); padding: 20px; border-radius: 12px;
+            display: none; z-index: 10000; text-align: center;
         }
 
         @media (max-width: 600px) {
-            #header-banner { top: 10px; right: 0; left: 0; text-align: center; width: 100%; }
-            #command-menu { top: 60px; left: 50%; transform: translateX(-50%); width: 90%; }
-            .character.hero { transform: translate3d(0, 0, 200px) scale(2.5) !important; }
+            .character.hero { transform: translate3d(0, 0, 200px) scale(2.8) !important; }
         }
     </style>
 </head>
 <body>
 
-<div id="header-banner">
-    <h1>STAFF APPRECIATION 2026</h1>
-    <p>Honoring every one of our Lime Street Staff members</p>
-</div>
-
 <div id="command-menu">
     <button class="menu-btn" onclick="location.reload()">🔄 SYNC LIVE DATA</button>
-    <button class="menu-btn" onclick="toggleRaffle(true)">🏆 RAFFLE WINNERS <span>›</span></button>
-    <button class="menu-btn" onclick="toggleDropdown()">👥 STAFF LIST <span id="drop-arrow">▼</span></button>
+    <button class="menu-btn" onclick="toggleDropdown()">👥 STAFF LIST <span>▼</span></button>
     <div id="staff-dropdown"></div>
 </div>
 
-<div id="raffle-panel">
-    <h2 style="margin-top:0; color:var(--tech-gold)">Winners List</h2>
-    <div id="winner-list-box" style="max-height: 250px; overflow-y: auto;"></div>
-    <button onclick="toggleRaffle(false)" style="width:100%; margin-top:20px; background:none; border:1px solid #444; color:white; padding:10px; cursor:pointer">CLOSE</button>
-</div>
-
 <div id="stage">
-    <div id="logo-hub" onclick="shuffleOrbits()">
-        <img src="Lime_Street_Elementary_School_logo_template_300.png" alt="Logo">
+    <div id="logo-hub">
+        <img src="Lime_Street_Elementary_School_logo_template_300.png" style="width:120px;" alt="Logo">
     </div>
 </div>
 
@@ -130,40 +115,32 @@
     let autoCloseTimer = null;
 
     async function init() {
-        try {
-            const response = await fetch(csvUrl);
-            const data = await response.text();
-            const rows = data.split('\n').slice(1);
-            const dropdown = document.getElementById('staff-dropdown');
-            const winBox = document.getElementById('winner-list-box');
+        const response = await fetch(csvUrl);
+        const data = await response.text();
+        const rows = data.split('\n').slice(1);
+        const dropdown = document.getElementById('staff-dropdown');
 
-            rows.forEach((row, i) => {
-                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                if(cols.length < 4) return;
-                const staff = {
-                    id: `staff-${i}`,
-                    name: cols[1].replace(/"/g, '').trim(),
-                    quote: cols[2].replace(/"/g, ''),
-                    photo: cols[3].trim(),
-                    years: parseInt(cols[4]) || 1,
-                    isWinner: cols[5]?.toLowerCase().includes('yes'),
-                    prize: cols[6] || "Gift"
-                };
-                staffData.push(staff);
-                createAvatar(staff, i);
-                if(staff.isWinner) {
-                    winBox.innerHTML += `<div style="padding:8px; border-bottom:1px solid #222"><b>${staff.name}</b><br><small style="color:var(--tech-gold)">${staff.prize}</small></div>`;
-                }
-            });
+        rows.forEach((row, i) => {
+            const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if(cols.length < 4) return;
+            const staff = {
+                id: `staff-${i}`,
+                name: cols[1].replace(/"/g, '').trim(),
+                quote: cols[2].replace(/"/g, ''),
+                photo: cols[3].trim(),
+                years: parseInt(cols[4]) || 1
+            };
+            staffData.push(staff);
+            createAvatar(staff, i);
+        });
 
-            staffData.sort((a,b) => a.name.localeCompare(b.name)).forEach(s => {
-                const link = document.createElement('div');
-                link.className = 'staff-link';
-                link.innerText = s.name;
-                link.onclick = (e) => { e.stopPropagation(); focusStaff(s.id); };
-                dropdown.appendChild(link);
-            });
-        } catch (e) { console.error(e); }
+        staffData.sort((a,b) => a.name.localeCompare(b.name)).forEach(s => {
+            const link = document.createElement('div');
+            link.className = 'staff-link';
+            link.innerText = s.name;
+            link.onclick = (e) => { e.stopPropagation(); focusStaff(s.id); };
+            dropdown.appendChild(link);
+        });
     }
 
     function createAvatar(staff, index) {
@@ -171,29 +148,31 @@
         char.className = 'character';
         char.id = staff.id;
         
-        const isCrowded = rowsCount() > 20;
-        const radius = isCrowded ? 160 + (Math.random() * 240) : 130 + (Math.random() * 100);
-        const duration = 40 + (Math.random() * 40);
-        
-        const animName = `orbit${index}`;
+        const radius = 140 + (Math.random() * 150);
+        const duration = 30 + (Math.random() * 30);
+        const animName = `orb${index}`;
         const style = document.createElement("style");
         style.innerText = `@keyframes ${animName} { from { transform: rotate(0deg) translateX(${radius}px) rotate(0deg); } to { transform: rotate(360deg) translateX(${radius}px) rotate(-360deg); } }`;
         document.head.appendChild(style);
         char.style.animation = `${animName} ${duration}s linear infinite`;
 
-        let id = staff.photo.includes('id=') ? staff.photo.split('id=')[1].split('&')[0] : 
-                 staff.photo.includes('/d/') ? staff.photo.split('/d/')[1].split('/')[0] : "";
+        let id = staff.photo.includes('id=') ? staff.photo.split('id=')[1].split('&')[0] : "";
         const img = id ? `https://lh3.googleusercontent.com/u/0/d/${id}` : staff.photo;
 
-        char.innerHTML = `<div class="face ${staff.isWinner ? 'winner-glow' : ''}" style="background-image: url('${img}')"></div>`;
+        // Generate dynamic rings based on years of service
+        let ringsHtml = '';
+        const ringCount = Math.min(staff.years, 8); 
+        for(let r=0; r < ringCount; r++) {
+            ringsHtml += `<div class="service-ring" style="animation-delay: ${r * 0.4}s; width: ${60 + (r*20)}px; height: ${60 + (r*20)}px;"></div>`;
+        }
+
+        char.innerHTML = `${ringsHtml}<div class="face" style="background-image: url('${img}')"></div>`;
         char.onclick = (e) => showHero(staff, char, e);
         document.getElementById('stage').appendChild(char);
     }
 
-    function rowsCount() { return staffData.length; }
     function toggleDropdown() { document.getElementById('staff-dropdown').classList.toggle('open'); }
-    function toggleRaffle(show) { document.getElementById('raffle-panel').style.display = show ? 'block' : 'none'; }
-    
+
     function focusStaff(id) {
         const char = document.getElementById(id);
         const staff = staffData.find(s => s.id === id);
@@ -206,18 +185,23 @@
     function showHero(staff, element, e) {
         if(e) e.stopPropagation();
         clearTimeout(autoCloseTimer);
-        document.querySelectorAll('.character').forEach(c => c.classList.remove('hero'));
+        closeHero(); // Reset any existing hero
+        
         element.classList.add('hero');
         const card = document.getElementById('profile-card');
-        card.innerHTML = `<h3 style="margin:0; color:var(--tech-gold)">${staff.name}</h3><p style="font-size:10px; color:#555;">${staff.years} Years</p><p style="font-style:italic;">"${staff.quote}"</p>`;
+        card.innerHTML = `<h3 style="margin:0; color:var(--tech-gold)">${staff.name}</h3><p style="font-size:12px; color:#aaa; margin:5px 0;">${staff.years} Years of Impact</p><p style="font-style:italic; font-size:14px;">"${staff.quote}"</p>`;
         card.style.display = 'block';
-        autoCloseTimer = setTimeout(closeHero, 10000);
+        
+        autoCloseTimer = setTimeout(closeHero, 9000); // 9 second timer
     }
 
     function closeHero() { 
         document.querySelectorAll('.character').forEach(c => c.classList.remove('hero')); 
         document.getElementById('profile-card').style.display = 'none'; 
     }
+
+    // Close on background click
+    document.addEventListener('click', (e) => { if(!e.target.closest('.character')) closeHero(); });
 
     init();
 </script>

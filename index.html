@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 Lime Street - Stage Director</title>
+    <title>2026 Lime Street - Director Fixed</title>
     <style>
         :root {
             --tech-gold: #d4af37;
@@ -20,18 +20,20 @@
             color: white;
         }
 
-        /* HEADER */
-        #header-banner {
-            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            text-align: center; z-index: 5001; pointer-events: none; width: 100%;
+        /* FIXED HEADER: Stays at the top center, clear of buttons */
+        #ui-layer {
+            position: fixed; top: 0; left: 0; width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            padding-top: 15px; z-index: 5001; pointer-events: none;
         }
+        #header-banner { text-align: center; margin-bottom: 15px; }
         #header-banner h1 { margin: 0; font-size: 18px; font-weight: 800; color: var(--tech-gold); text-transform: uppercase; letter-spacing: 2px; }
         #header-banner p { margin: 2px 0; font-size: 10px; color: #888; }
 
-        /* MENU */
+        /* FIXED MENU: Positioned below the header on mobile to prevent overlap */
         #command-menu {
-            position: fixed; top: 15px; left: 15px;
-            width: 200px; z-index: 5000;
+            pointer-events: auto;
+            width: 90%; max-width: 220px;
             display: flex; flex-direction: column; gap: 8px;
         }
         .menu-btn {
@@ -45,8 +47,8 @@
             border-radius: 6px; transition: max-height 0.4s ease;
             display: flex; flex-direction: column;
         }
-        #staff-dropdown.open { max-height: 300px; overflow-y: auto; border: 1px solid var(--ui-border); }
-        .staff-link { padding: 10px 15px; font-size: 12px; color: #ccc; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        #staff-dropdown.open { max-height: 250px; overflow-y: auto; border: 1px solid var(--ui-border); }
+        .staff-link { padding: 10px; font-size: 12px; color: #ccc; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
         /* RAFFLE POPUP */
         #raffle-panel {
@@ -58,18 +60,11 @@
 
         /* STAGE */
         #stage { width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; perspective: 1500px; }
-        
-        /* CHARACTER TRANSITIONS */
-        .character { 
-            position: absolute; cursor: pointer; z-index: 10; 
-            transition: opacity 1.5s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0; 
-        }
+        .character { position: absolute; cursor: pointer; z-index: 10; transition: opacity 1.5s ease, transform 0.8s; opacity: 0; }
         .character.active { opacity: 1; }
-        
         .face { width: 60px; height: 60px; border-radius: 50%; border: 2px solid white; background-size: cover; background-position: center; position: relative; z-index: 5; }
 
-        /* RADIATING RINGS */
+        /* RADIATING HERO RING */
         .service-ring {
             position: absolute; border: 1.5px solid var(--tech-gold); border-radius: 50%;
             top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
@@ -98,22 +93,25 @@
         }
 
         @media (max-width: 600px) {
+            #header-banner h1 { font-size: 15px; }
             .character.hero { transform: translate3d(0, 0, 200px) scale(2.5) !important; }
         }
     </style>
 </head>
 <body>
 
-<div id="header-banner">
-    <h1>STAFF APPRECIATION 2026</h1>
-    <p>Lime Street Elementary School</p>
-</div>
+<div id="ui-layer">
+    <div id="header-banner">
+        <h1>STAFF APPRECIATION 2026</h1>
+        <p>Lime Street Elementary School</p>
+    </div>
 
-<div id="command-menu">
-    <button class="menu-btn" onclick="syncData()">🔄 SYNC LIVE DATA</button>
-    <button class="menu-btn" onclick="toggleRaffle(true)">🏆 RAFFLE WINNERS</button>
-    <button class="menu-btn" onclick="toggleDropdown()">👥 STAFF LIST <span>▼</span></button>
-    <div id="staff-dropdown"></div>
+    <div id="command-menu">
+        <button class="menu-btn" onclick="syncData()">🔄 SYNC LIVE DATA</button>
+        <button class="menu-btn" onclick="toggleRaffle(true)">🏆 RAFFLE WINNERS</button>
+        <button class="menu-btn" onclick="toggleDropdown()">👥 STAFF LIST <span>▼</span></button>
+        <div id="staff-dropdown"></div>
+    </div>
 </div>
 
 <div id="raffle-panel">
@@ -131,14 +129,11 @@
 <script>
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwz4lMDeYja7-Vluu-B8-StkdVcoMMQSS2-nYsrQxtOSm4SK-IwmJhSpvUlqK5TqrkHZKIVEz_RihC/pub?output=csv";
     let staffAll = [];
-    let onStage = []; // Staff IDs currently displayed
+    let onStage = []; 
     let autoCloseTimer = null;
-    let rotationTimer = null;
     const MAX_ON_STAGE = 25;
 
-    function syncData() {
-        window.location.href = window.location.pathname + "?v=" + new Date().getTime();
-    }
+    function syncData() { window.location.href = window.location.pathname + "?v=" + new Date().getTime(); }
 
     async function init() {
         const response = await fetch(csvUrl + "&t=" + new Date().getTime());
@@ -165,7 +160,6 @@
             }
         });
 
-        // Fill dropdown
         staffAll.sort((a,b) => a.name.localeCompare(b.name)).forEach(s => {
             const link = document.createElement('div');
             link.className = 'staff-link';
@@ -174,16 +168,10 @@
             dropdown.appendChild(link);
         });
 
-        // Initial stage load
         const initialCount = Math.min(staffAll.length, MAX_ON_STAGE);
-        for(let i=0; i<initialCount; i++) {
-            addStaffToStage(staffAll[i].id);
-        }
+        for(let i=0; i<initialCount; i++) { addStaffToStage(staffAll[i].id); }
 
-        // Start Director rotation if we have more than the limit
-        if(staffAll.length > MAX_ON_STAGE) {
-            rotationTimer = setInterval(rotateStaff, 8000);
-        }
+        if(staffAll.length > MAX_ON_STAGE) { setInterval(rotateStaff, 8000); }
     }
 
     function addStaffToStage(id) {
@@ -215,48 +203,30 @@
         char.onclick = (e) => showHero(staff, char, e);
         document.getElementById('stage').appendChild(char);
         onStage.push(id);
-        
-        // Short delay to trigger fade-in transition
         setTimeout(() => char.classList.add('active'), 100);
-    }
-
-    function removeStaffFromStage(id) {
-        const char = document.getElementById(id);
-        if(!char || char.classList.contains('hero')) return false; // Don't remove if currently being viewed
-        
-        char.classList.remove('active');
-        onStage = onStage.filter(sid => sid !== id);
-        
-        setTimeout(() => {
-            char.remove();
-            const style = document.getElementById(`style-${id}`);
-            if(style) style.remove();
-        }, 1500); // Match CSS fade transition
-        return true;
     }
 
     function rotateStaff() {
         const waitingPool = staffAll.filter(s => !onStage.includes(s.id));
         if(waitingPool.length === 0) return;
-
         const offIdx = Math.floor(Math.random() * onStage.length);
         const targetId = onStage[offIdx];
+        const char = document.getElementById(targetId);
+        if(!char || char.classList.contains('hero')) return;
         
-        if(removeStaffFromStage(targetId)) {
-            const nextIdx = Math.floor(Math.random() * waitingPool.length);
-            addStaffToStage(waitingPool[nextIdx].id);
-        }
+        char.classList.remove('active');
+        onStage = onStage.filter(sid => sid !== targetId);
+        setTimeout(() => {
+            char.remove();
+            const style = document.getElementById(`style-${targetId}`);
+            if(style) style.remove();
+            addStaffToStage(waitingPool[Math.floor(Math.random() * waitingPool.length)].id);
+        }, 1500);
     }
 
     function focusStaff(id) {
         toggleDropdown();
-        // If not on stage, swap them in immediately
-        if(!onStage.includes(id)) {
-            const offIdx = Math.floor(Math.random() * onStage.length);
-            removeStaffFromStage(onStage[offIdx]);
-            addStaffToStage(id);
-        }
-        
+        if(!onStage.includes(id)) { addStaffToStage(id); }
         setTimeout(() => {
             const char = document.getElementById(id);
             const staff = staffAll.find(s => s.id === id);
@@ -270,7 +240,7 @@
         closeHero();
         element.classList.add('hero');
         const card = document.getElementById('profile-card');
-        card.innerHTML = `<h3 style="margin:0; color:var(--tech-gold)">${staff.name}</h3><p style="font-size:11px; color:#888;">${staff.years} Years of Service</p><p style="font-style:italic; font-size:13px; margin-top:8px;">"${staff.quote}"</p>`;
+        card.innerHTML = `<h3 style="margin:0; color:var(--tech-gold)">${staff.name}</h3><p style="font-size:11px; color:#888;">${staff.years} Years</p><p style="font-style:italic; font-size:13px; margin-top:8px;">"${staff.quote}"</p>`;
         card.style.display = 'block';
         autoCloseTimer = setTimeout(closeHero, 9000);
     }
@@ -282,7 +252,6 @@
 
     function toggleDropdown() { document.getElementById('staff-dropdown').classList.toggle('open'); }
     function toggleRaffle(show) { document.getElementById('raffle-panel').style.display = show ? 'block' : 'none'; }
-
     document.addEventListener('click', (e) => { if(!e.target.closest('.character')) closeHero(); });
     init();
 </script>

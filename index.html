@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 Lime Street - Interactive Fix</title>
+    <title>2026 Lime Street - Restored</title>
     <style>
         :root {
             --school-red: #b31b1b;
@@ -23,16 +23,16 @@
 
         /* HEADER */
         #header-banner {
-            position: fixed; top: 15px; right: 20px;
+            position: fixed; top: 10px; right: 20px;
             text-align: right; z-index: 2005; pointer-events: none;
         }
         #header-banner h1 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: 2px; color: var(--tech-gold); text-transform: uppercase; }
         #header-banner p { margin: 2px 0; font-size: 10px; color: #888; }
 
-        /* MENU CONTROLS */
+        /* MENU */
         #command-menu {
             position: fixed; top: 15px; left: 15px;
-            width: 220px; z-index: 9999; /* Highest priority */
+            width: 220px; z-index: 5000;
             display: flex; flex-direction: column; gap: 10px;
         }
         .menu-btn {
@@ -41,47 +41,58 @@
             cursor: pointer; font-size: 11px; font-weight: bold;
             text-align: left; transition: all 0.2s; backdrop-filter: blur(10px);
             display: flex; justify-content: space-between; align-items: center;
-            pointer-events: auto; /* Ensure clickable */
         }
-        .menu-btn:hover { border-color: var(--tech-gold); background: rgba(40, 40, 40, 0.9); }
+        .menu-btn:hover { border-color: var(--tech-gold); }
 
         #staff-dropdown {
             max-height: 0; overflow: hidden; background: rgba(15, 15, 15, 0.98);
-            border-radius: 6px; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column; z-index: 5001;
+            border-radius: 6px; transition: max-height 0.4s ease;
+            display: flex; flex-direction: column;
         }
         #staff-dropdown.open { max-height: 350px; overflow-y: auto; border: 1px solid var(--ui-border); }
         .staff-link { padding: 12px 15px; font-size: 12px; color: #ccc; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .staff-link:hover { background: var(--tech-gold); color: black; }
 
+        /* RAFFLE POPUP */
+        #raffle-panel {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 350px; background: rgba(10, 10, 10, 0.98);
+            border: 1px solid var(--tech-gold); border-radius: 12px;
+            padding: 25px; z-index: 6000; display: none; backdrop-filter: blur(20px);
+        }
+
         /* STAGE */
         #stage { 
             width: 100vw; height: 100vh; 
             display: flex; justify-content: center; align-items: center; 
-            position: relative; z-index: 5;
-            perspective: 1200px;
+            position: relative; z-index: 5; perspective: 1200px;
         }
 
-        #logo-hub { 
-            width: 120px; height: 120px; 
-            z-index: 100; cursor: pointer;
-            display: flex; justify-content: center; align-items: center;
-        }
+        #logo-hub { width: 120px; height: 120px; z-index: 100; cursor: pointer; }
         #logo-hub img { width: 100%; height: auto; filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4)); }
         
-        .character { 
-            position: absolute; display: flex; flex-direction: column; align-items: center; 
-            cursor: pointer; z-index: 10; transition: opacity 1s, transform 0.5s;
+        .character { position: absolute; cursor: pointer; z-index: 10; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .face { width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; background-size: cover; background-position: center; }
+        .winner-glow { border: 3px solid var(--tech-gold) !important; box-shadow: 0 0 15px var(--tech-gold); }
+
+        /* HERO FOCUS */
+        .character.hero {
+            transform: translate3d(0, 0, 400px) scale(3) !important;
+            top: 50% !important; left: 50% !important; 
+            margin-top: -25px; margin-left: -25px; 
+            z-index: 9999 !important;
         }
-        .face { width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; background-size: cover; background-position: center; position: relative; z-index: 5; }
-        
-        .winner-glow { border: 3px solid var(--tech-gold) !important; animation: win-pulse 3s infinite ease-in-out; }
-        @keyframes win-pulse { 0%, 100% { box-shadow: 0 0 10px var(--tech-gold); } 50% { box-shadow: 0 0 30px var(--tech-gold); } }
 
         #profile-card { 
             position: fixed; bottom: 20px; left: 20px; width: calc(100% - 40px); max-width: 300px;
             background: rgba(15,15,15,0.95); border: 1px solid var(--tech-gold); 
             padding: 20px; border-radius: 8px; display: none; z-index: 10000; backdrop-filter: blur(15px);
+        }
+
+        @media (max-width: 600px) {
+            #header-banner { top: 10px; right: 0; left: 0; text-align: center; width: 100%; }
+            #command-menu { top: 60px; left: 50%; transform: translateX(-50%); width: 90%; }
+            .character.hero { transform: translate3d(0, 0, 200px) scale(2.5) !important; }
         }
     </style>
 </head>
@@ -93,16 +104,21 @@
 </div>
 
 <div id="command-menu">
-    <!-- Updated Sync with a specific function instead of reload -->
-    <button class="menu-btn" onclick="syncData(event)" style="border-color: var(--tech-gold)">🔄 SYNC LIVE DATA</button>
-    <button class="menu-btn" onclick="toggleRaffle(event)">🏆 RAFFLE WINNERS <span>›</span></button>
-    <button class="menu-btn" onclick="toggleDropdown(event)">👥 STAFF LIST <span id="drop-arrow">▼</span></button>
+    <button class="menu-btn" onclick="location.reload()">🔄 SYNC LIVE DATA</button>
+    <button class="menu-btn" onclick="toggleRaffle(true)">🏆 RAFFLE WINNERS <span>›</span></button>
+    <button class="menu-btn" onclick="toggleDropdown()">👥 STAFF LIST <span id="drop-arrow">▼</span></button>
     <div id="staff-dropdown"></div>
+</div>
+
+<div id="raffle-panel">
+    <h2 style="margin-top:0; color:var(--tech-gold)">Winners List</h2>
+    <div id="winner-list-box" style="max-height: 250px; overflow-y: auto;"></div>
+    <button onclick="toggleRaffle(false)" style="width:100%; margin-top:20px; background:none; border:1px solid #444; color:white; padding:10px; cursor:pointer">CLOSE</button>
 </div>
 
 <div id="stage">
     <div id="logo-hub" onclick="shuffleOrbits()">
-        <img src="Lime_Street_Elementary_School_logo_template_300.png" alt="STI LOGO">
+        <img src="Lime_Street_Elementary_School_logo_template_300.png" alt="Logo">
     </div>
 </div>
 
@@ -112,7 +128,6 @@
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwz4lMDeYja7-Vluu-B8-StkdVcoMMQSS2-nYsrQxtOSm4SK-IwmJhSpvUlqK5TqrkHZKIVEz_RihC/pub?output=csv";
     let staffData = [];
     let autoCloseTimer = null;
-    let showingWinnersOnly = false;
 
     async function init() {
         try {
@@ -120,11 +135,7 @@
             const data = await response.text();
             const rows = data.split('\n').slice(1);
             const dropdown = document.getElementById('staff-dropdown');
-            
-            // Clear existing data for Sync/Reload
-            staffData = [];
-            dropdown.innerHTML = "";
-            document.querySelectorAll('.character').forEach(c => c.remove());
+            const winBox = document.getElementById('winner-list-box');
 
             rows.forEach((row, i) => {
                 const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
@@ -135,73 +146,40 @@
                     quote: cols[2].replace(/"/g, ''),
                     photo: cols[3].trim(),
                     years: parseInt(cols[4]) || 1,
-                    isWinner: cols[5]?.toLowerCase().includes('yes')
+                    isWinner: cols[5]?.toLowerCase().includes('yes'),
+                    prize: cols[6] || "Gift"
                 };
                 staffData.push(staff);
                 createAvatar(staff, i);
+                if(staff.isWinner) {
+                    winBox.innerHTML += `<div style="padding:8px; border-bottom:1px solid #222"><b>${staff.name}</b><br><small style="color:var(--tech-gold)">${staff.prize}</small></div>`;
+                }
             });
 
             staffData.sort((a,b) => a.name.localeCompare(b.name)).forEach(s => {
                 const link = document.createElement('div');
                 link.className = 'staff-link';
                 link.innerText = s.name;
-                link.onclick = (e) => { e.stopPropagation(); focusStaff(s.id); toggleDropdown(e); };
+                link.onclick = (e) => { e.stopPropagation(); focusStaff(s.id); };
                 dropdown.appendChild(link);
             });
-        } catch (e) { console.error("Initialization error:", e); }
-    }
-
-    function syncData(e) {
-        if(e) e.stopPropagation();
-        init();
-    }
-
-    function toggleRaffle(e) {
-        if(e) e.stopPropagation();
-        showingWinnersOnly = !showingWinnersOnly;
-        
-        staffData.forEach(staff => {
-            const el = document.getElementById(staff.id);
-            if (el) {
-                if (showingWinnersOnly) {
-                    el.style.display = staff.isWinner ? 'flex' : 'none';
-                } else {
-                    el.style.display = 'flex';
-                }
-            }
-        });
-    }
-
-    function applyOrbit(element, index) {
-        const isCrowded = staffData.length > 20;
-        const isBackground = isCrowded && (Math.random() > 0.6);
-        
-        // Dynamic distancing
-        const minRad = isCrowded ? 160 : 120;
-        const maxRad = isCrowded ? 400 : 250;
-        const radius = minRad + (Math.random() * (maxRad - minRad));
-        
-        const duration = 35 + (Math.random() * 65);
-        const depth = isBackground ? -250 : 0;
-        
-        element.style.opacity = isBackground ? "0.35" : "1";
-        element.style.filter = (isCrowded && isBackground) ? "blur(2px)" : "none";
-        
-        const animName = `orbit${index}_${Math.floor(Math.random()*10000)}`;
-        const style = document.createElement("style");
-        style.innerText = `@keyframes ${animName} { 
-            from { transform: translate3d(0,0,${depth}px) rotate(0deg) translateX(${radius}px) rotate(0deg); } 
-            to { transform: translate3d(0,0,${depth}px) rotate(360deg) translateX(${radius}px) rotate(-360deg); } 
-        }`;
-        document.head.appendChild(style);
-        element.style.animation = `${animName} ${duration}s linear infinite`;
+        } catch (e) { console.error(e); }
     }
 
     function createAvatar(staff, index) {
         const char = document.createElement('div');
         char.className = 'character';
         char.id = staff.id;
-        applyOrbit(char, index);
+        
+        const isCrowded = rowsCount() > 20;
+        const radius = isCrowded ? 160 + (Math.random() * 240) : 130 + (Math.random() * 100);
+        const duration = 40 + (Math.random() * 40);
+        
+        const animName = `orbit${index}`;
+        const style = document.createElement("style");
+        style.innerText = `@keyframes ${animName} { from { transform: rotate(0deg) translateX(${radius}px) rotate(0deg); } to { transform: rotate(360deg) translateX(${radius}px) rotate(-360deg); } }`;
+        document.head.appendChild(style);
+        char.style.animation = `${animName} ${duration}s linear infinite`;
 
         let id = staff.photo.includes('id=') ? staff.photo.split('id=')[1].split('&')[0] : 
                  staff.photo.includes('/d/') ? staff.photo.split('/d/')[1].split('/')[0] : "";
@@ -212,44 +190,32 @@
         document.getElementById('stage').appendChild(char);
     }
 
-    function toggleDropdown(e) {
-        if(e) e.stopPropagation();
-        const d = document.getElementById('staff-dropdown');
-        const arrow = document.getElementById('drop-arrow');
-        d.classList.toggle('open');
-        if(arrow) arrow.innerText = d.classList.contains('open') ? '▲' : '▼';
+    function rowsCount() { return staffData.length; }
+    function toggleDropdown() { document.getElementById('staff-dropdown').classList.toggle('open'); }
+    function toggleRaffle(show) { document.getElementById('raffle-panel').style.display = show ? 'block' : 'none'; }
+    
+    function focusStaff(id) {
+        const char = document.getElementById(id);
+        const staff = staffData.find(s => s.id === id);
+        if(char && staff) {
+            showHero(staff, char);
+            document.getElementById('staff-dropdown').classList.remove('open');
+        }
     }
 
     function showHero(staff, element, e) {
         if(e) e.stopPropagation();
         clearTimeout(autoCloseTimer);
-        document.querySelectorAll('.character').forEach(c => {
-            c.style.visibility = 'hidden';
-            c.style.opacity = '0';
-        });
-        
-        element.style.visibility = 'visible';
-        element.style.opacity = '1';
-        element.style.transform = 'scale(3) translateZ(300px)';
-        element.style.zIndex = '999';
-
+        document.querySelectorAll('.character').forEach(c => c.classList.remove('hero'));
+        element.classList.add('hero');
         const card = document.getElementById('profile-card');
-        card.innerHTML = `
-            <h3 style="margin:0; color:var(--tech-gold)">${staff.name}</h3>
-            <p style="font-size:10px; color:#888; margin-bottom:10px">${staff.years} Years of Service</p>
-            <p style="font-style:italic; font-size:13px">"${staff.quote}"</p>
-        `;
+        card.innerHTML = `<h3 style="margin:0; color:var(--tech-gold)">${staff.name}</h3><p style="font-size:10px; color:#555;">${staff.years} Years</p><p style="font-style:italic;">"${staff.quote}"</p>`;
         card.style.display = 'block';
-        autoCloseTimer = setTimeout(() => { closeHero(); }, 10000);
+        autoCloseTimer = setTimeout(closeHero, 10000);
     }
 
     function closeHero() { 
-        document.querySelectorAll('.character').forEach(c => {
-            c.style.visibility = 'visible';
-            c.style.opacity = c.style.filter.includes('blur') ? '0.35' : '1';
-            c.style.transform = '';
-            c.style.zIndex = '10';
-        });
+        document.querySelectorAll('.character').forEach(c => c.classList.remove('hero')); 
         document.getElementById('profile-card').style.display = 'none'; 
     }
 
